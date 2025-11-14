@@ -16,6 +16,9 @@ public class Balise {
     Announcer announcer;
     private method.MovingMethod movingMethod;
     
+    // Dimensions de la balise
+    private static final int BALISE_SIZE = 30;  // Taille de la balise (largeur et hauteur)
+    
     // Gestion des états
     private BaliseState state;                  // État actuel de la balise
     private int memory;                         // Mémoire actuelle (données collectées)
@@ -23,7 +26,10 @@ public class Balise {
     private int collectSpeed;                   // Vitesse de collecte (données par move())
     private int initialY;                       // Position Y initiale (profondeur maximale)
     private static final int SURFACE_Y = 300;  // Y où se trouve la surface de l'océan
+    private static final int OCEAN_BOTTOM = 600; // Fond de l'océan
+    private static final int SCREEN_WIDTH = 800;  // Largeur de l'écran
     private int riseSpeed;                      // Vitesse de remontée en pixels par move()
+    private int descentSpeed;                   // Vitesse de descente après synchronisation
     
     // Gestion de la synchronisation
     private Satellite currentSatellite;         // Satellite actuellement en synchronisation
@@ -48,6 +54,7 @@ public class Balise {
         this.maxMemory = 150 + (int)(Math.random() * 150);     // Capacité entre 150 et 300
         this.collectSpeed = 1 + (int)(Math.random() * 3);      // Vitesse entre 1 et 3 (plus lent)
         this.riseSpeed = 1 + (int)(Math.random() * 3);         // Vitesse de remontée entre 1 et 3
+        this.descentSpeed = 1 + (int)(Math.random() * 2);      // Vitesse de descente entre 1 et 2 (lente)
         this.transferSpeed = 5 + (int)(Math.random() * 10);    // Vitesse de transfert entre 5 et 14
         this.initialY = y;                      // Mémoriser la profondeur initiale
         this.currentSatellite = null;           // Pas de satellite en cours
@@ -72,6 +79,7 @@ public class Balise {
         this.maxMemory = 150 + (int)(Math.random() * 150);     // Capacité entre 150 et 300
         this.collectSpeed = 1 + (int)(Math.random() * 3);      // Vitesse entre 1 et 3 (plus lent)
         this.riseSpeed = 1 + (int)(Math.random() * 3);         // Vitesse de remontée entre 1 et 3
+        this.descentSpeed = 1 + (int)(Math.random() * 2);      // Vitesse de descente entre 1 et 2 (lente)
         this.transferSpeed = 5 + (int)(Math.random() * 10);    // Vitesse de transfert entre 5 et 14
         this.initialY = y;                      // Mémoriser la profondeur initiale
         this.currentSatellite = null;           // Pas de satellite en cours
@@ -112,6 +120,19 @@ public class Balise {
                     endSynchronisation();
                 }
             }
+        } else if (state == BaliseState.DESCENTE) {
+            // Phase de descente : la balise redescend progressivement vers sa profondeur initiale
+            if (y < initialY) {
+                y += descentSpeed;  // Descendre doucement
+                // Si on a atteint ou dépassé la profondeur initiale
+                if (y >= initialY) {
+                    y = initialY;
+                    setState(BaliseState.COLLECTE);  // Reprendre la collecte
+                }
+            } else {
+                // Déjà à la bonne profondeur
+                setState(BaliseState.COLLECTE);
+            }
         }
         announcer.announce(new BaliseMoveEvent(this));
     }
@@ -145,7 +166,7 @@ public class Balise {
     }
     
     /**
-     * Termine la synchronisation et retourne à la phase de collecte
+     * Termine la synchronisation et commence la descente progressive
      */
     private void endSynchronisation() {
         if (currentSatellite != null) {
@@ -154,9 +175,8 @@ public class Balise {
             currentSatellite.setDisponible(true);  // Le satellite redevient disponible
             currentSatellite = null;
         }
-        // Retourner à la profondeur initiale pour recommencer la collecte
-        y = initialY;
-        setState(BaliseState.COLLECTE);
+        // Passer en mode DESCENTE pour redescendre progressivement
+        setState(BaliseState.DESCENTE);
     }
 
     public void registerMoveEvent(Object o) {
@@ -185,7 +205,19 @@ public class Balise {
     }
 
     public void setX(int x) {
-        this.x = x;
+        // Limiter X dans les bornes de l'écran en tenant compte de la taille de la balise
+        // La balise ne peut pas dépasser les bords avec ses extrémités
+        if (x < 0) {
+            this.x = 0;
+            // Inverser la direction quand on touche le bord gauche
+            this.direction = -this.direction;
+        } else if (x > SCREEN_WIDTH - BALISE_SIZE) {
+            this.x = SCREEN_WIDTH - BALISE_SIZE;
+            // Inverser la direction quand on touche le bord droit
+            this.direction = -this.direction;
+        } else {
+            this.x = x;
+        }
     }
 
     public int getY() {
@@ -193,7 +225,27 @@ public class Balise {
     }
 
     public void setY(int y) {
-        this.y = y;
+        // Limiter Y dans la zone océan en tenant compte de la taille de la balise
+        // La balise ne peut pas dépasser les bords avec ses extrémités
+        if (state == BaliseState.COLLECTE || state == BaliseState.DESCENTE) {
+            // En collecte ou descente, rester entre la surface et le fond
+            if (y < SURFACE_Y) {
+                this.y = SURFACE_Y;
+            } else if (y > OCEAN_BOTTOM - BALISE_SIZE) {
+                this.y = OCEAN_BOTTOM - BALISE_SIZE;
+            } else {
+                this.y = y;
+            }
+        } else {
+            // En remontée ou synchronisation, peut être à la surface
+            if (y < SURFACE_Y) {
+                this.y = SURFACE_Y;
+            } else if (y > OCEAN_BOTTOM - BALISE_SIZE) {
+                this.y = OCEAN_BOTTOM - BALISE_SIZE;
+            } else {
+                this.y = y;
+            }
+        }
     }
 
     public int getDirection() {
