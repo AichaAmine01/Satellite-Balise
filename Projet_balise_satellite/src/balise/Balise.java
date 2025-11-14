@@ -19,9 +19,10 @@ public class Balise {
     private BaliseState state;                  // État actuel de la balise
     private int memory;                         // Mémoire actuelle (données collectées)
     private int maxMemory;                      // Capacité maximale de mémoire
+    private int collectSpeed;                   // Vitesse de collecte (données par move())
     private int initialY;                       // Position Y initiale (profondeur maximale)
     private static final int SURFACE_Y = 300;  // Y où se trouve la surface de l'océan
-    private static final int RISE_SPEED = 2;   // Vitesse de remontée en pixels par move()
+    private int riseSpeed;                      // Vitesse de remontée en pixels par move()
 
     /**
      * Constructeur simple de la balise
@@ -37,7 +38,10 @@ public class Balise {
         this.announcer = new Announcer();
         this.state = BaliseState.COLLECTE;      // État initial : collecte
         this.memory = 0;                        // Mémoire initialement vide
-        this.maxMemory = 100;                   // Capacité max de mémoire
+        // Variabilité : chaque balise a des caractéristiques différentes
+        this.maxMemory = 150 + (int)(Math.random() * 150);     // Capacité entre 150 et 300
+        this.collectSpeed = 1 + (int)(Math.random() * 3);      // Vitesse entre 1 et 3 (plus lent)
+        this.riseSpeed = 1 + (int)(Math.random() * 3);         // Vitesse de remontée entre 1 et 3
         this.initialY = y;                      // Mémoriser la profondeur initiale
     }
 
@@ -56,7 +60,10 @@ public class Balise {
         this.announcer = new Announcer();
         this.state = BaliseState.COLLECTE;      // État initial : collecte
         this.memory = 0;                        // Mémoire initialement vide
-        this.maxMemory = 100;                   // Capacité max de mémoire
+        // Variabilité : chaque balise a des caractéristiques différentes
+        this.maxMemory = 150 + (int)(Math.random() * 150);     // Capacité entre 150 et 300
+        this.collectSpeed = 1 + (int)(Math.random() * 3);      // Vitesse entre 1 et 3 (plus lent)
+        this.riseSpeed = 1 + (int)(Math.random() * 3);         // Vitesse de remontée entre 1 et 3
         this.initialY = y;                      // Mémoriser la profondeur initiale
     }
 
@@ -70,16 +77,16 @@ public class Balise {
             if (movingMethod != null) {
                 movingMethod.move(this);
             }
-            // Augmenter la mémoire pendant la collecte
-            memory += 5;
+            // Augmenter la mémoire pendant la collecte (vitesse variable)
+            memory += collectSpeed;
             // Si la mémoire est pleine, passer à la remontée
             if (memory >= maxMemory) {
                 setState(BaliseState.REMONTEE);
             }
         } else if (state == BaliseState.REMONTEE) {
-            // Phase de remontée : la balise monte vers la surface
+            // Phase de remontée : la balise monte vers la surface (vitesse variable)
             if (y > SURFACE_Y) {
-                y -= RISE_SPEED;
+                y -= riseSpeed;
             } else {
                 y = SURFACE_Y;  // Rester à la surface
             }
