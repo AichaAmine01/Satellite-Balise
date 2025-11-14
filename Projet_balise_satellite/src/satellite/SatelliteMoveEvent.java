@@ -1,10 +1,10 @@
-package Mobi;
+package satellite;
 
 import announcer.AbstractEvent;
 
-public class MobiMoveEvent extends AbstractEvent{
+public class SatelliteMoveEvent extends AbstractEvent{
 
-	public MobiMoveEvent(Object source) {
+	public SatelliteMoveEvent(Object source) {
 		super(source);
 	}
 
@@ -14,6 +14,6 @@ public class MobiMoveEvent extends AbstractEvent{
 	private static final long serialVersionUID = 1L;
 	@Override
 	public void sentTo(Object target) {
-		((MobilListener) target).MobilMoveEvent(this);
+		((SatelliteListener) target).onSatelliteMove(this);
 	}
 }

@@ -1,13 +1,13 @@
-package Mobi;
+package satellite;
 
 import announcer.Announcer;
 
-public class Mobi {
+public class Satellite {
 	private int x,y;
 	private int direction;
 	Announcer announcer;
 	
-	public Mobi (int x, int y, int direction) {
+	public Satellite (int x, int y, int direction) {
 		this.x = x;
 		this.y = y;
 		this.direction = direction;
@@ -16,11 +16,11 @@ public class Mobi {
 	
 	public void move(int gap) {
 		this.x = this.x + (direction*gap);
-		announcer.announce(new MobiMoveEvent(this));
+		announcer.announce(new SatelliteMoveEvent(this));
 	}
 
 	public void registerMoveEvent(Object o) {
-		this.announcer.register(o, MobiMoveEvent.class);
+		this.announcer.register(o, SatelliteMoveEvent.class);
 	}
 	
 	public int getX() {

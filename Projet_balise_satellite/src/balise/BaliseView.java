@@ -1,16 +1,21 @@
 package balise;
 
 import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+
 import src.nicellipse.component.NiRectangle;
 
 public class BaliseView extends NiRectangle implements BaliseListener {
-    private Balise balise;
+    private final Balise balise;
+    private Color color = Color.YELLOW;
+    private int w = 30, h = 30;
 
     public BaliseView(Balise balise) {
         this.balise = balise;
-        this.setBackground(Color.RED);
-        this.setSize(10, 10);
-        this.setLocation(balise.getX(), balise.getY());
+        // initialisation minimale de taille
+        this.setBounds(balise.getX(), balise.getY(), w, h);
+        this.setOpaque(true);
     }
 
     @Override
@@ -18,11 +23,29 @@ public class BaliseView extends NiRectangle implements BaliseListener {
         Balise source = (Balise) event.getSource();
         int x = source.getX();
         int y = source.getY();
-        this.setLocation(x, y);
+        this.setBounds(x, y, w, h);
+        this.revalidate();
+        this.repaint();
     }
 
     public Balise getBalise() {
         return balise;
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        g.setColor(color);
+        g.fillRect(0, 0, getWidth(), getHeight());
+    }
+
+    public void setColor(Color c) {
+        this.color = c;
+        repaint();
+    }
+
+    public Dimension getPreferredSize() {
+        return new Dimension(w, h);
     }
 
 }
