@@ -12,6 +12,7 @@ public class Satellite {
 	private String id;                    // Identifiant unique du satellite
 	private boolean disponible;           // Indique si le satellite peut recevoir des données
 	private int dataReceived;             // Quantité de données reçues
+	private int screenWidth;              // Largeur de l'écran pour la boucle
 	Announcer announcer;
 	
 	public Satellite(int x, int y, int direction) {
@@ -21,6 +22,7 @@ public class Satellite {
 		this.id = "Satellite_" + Math.abs(x + y + System.nanoTime());
 		this.disponible = true;           // Initialement disponible
 		this.dataReceived = 0;
+		this.screenWidth = 800;           // Valeur par défaut
 		this.announcer = new Announcer();
 	}
 	
@@ -31,11 +33,32 @@ public class Satellite {
 		this.id = id;
 		this.disponible = true;
 		this.dataReceived = 0;
+		this.screenWidth = 800;           // Valeur par défaut
 		this.announcer = new Announcer();
 	}
 	
+	/**
+	 * Définit la largeur de l'écran pour gérer la boucle continue
+	 * @param width Largeur de l'écran
+	 */
+	public void setScreenWidth(int width) {
+		this.screenWidth = width;
+	}
+	
+	/**
+	 * Déplace le satellite et gère la boucle (réapparition de l'autre côté)
+	 * @param gap Distance de déplacement
+	 */
 	public void move(int gap) {
 		this.x = this.x + (direction * gap);
+		
+		// Gestion de la boucle : si le satellite sort de l'écran, il réapparaît de l'autre côté
+		if (this.x > screenWidth) {
+			this.x = 0;  // Réapparaît à gauche
+		} else if (this.x < 0) {
+			this.x = screenWidth;  // Réapparaît à droite
+		}
+		
 		announcer.announce(new SatelliteMoveEvent(this));
 	}
 

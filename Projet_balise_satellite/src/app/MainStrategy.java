@@ -43,6 +43,7 @@ public class MainStrategy {
 		// ==================== SATELLITES - Dans l'espace (zone blanche) ====================
 		
 		Satellite s1 = new Satellite(100, 50, 1);
+		s1.setScreenWidth(800);  // Configurer la largeur de l'écran
 		SatelliteView sv1 = new SatelliteView(s1);
 		sv1.setBackground(Color.GRAY);
 		sv1.setSize(25, 25);
@@ -52,6 +53,7 @@ public class MainStrategy {
 		satelliteViews.add(sv1);
 
 		Satellite s2 = new Satellite(400, 100, -1);
+		s2.setScreenWidth(800);  // Configurer la largeur de l'écran
 		SatelliteView sv2 = new SatelliteView(s2);
 		sv2.setBackground(Color.GRAY);
 		sv2.setSize(25, 25);
@@ -61,6 +63,7 @@ public class MainStrategy {
 		satelliteViews.add(sv2);
 
 		Satellite s3 = new Satellite(650, 150, 1);
+		s3.setScreenWidth(800);  // Configurer la largeur de l'écran
 		SatelliteView sv3 = new SatelliteView(s3);
 		sv3.setBackground(Color.GRAY);
 		sv3.setSize(25, 25);
