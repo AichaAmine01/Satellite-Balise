@@ -74,66 +74,74 @@ public class MainStrategy {
 		// Bouton pour ajouter une balise
 		JButton addBaliseBtn = new JButton("Ajouter Balise");
 		addBaliseBtn.addActionListener(e -> {
-			// Créer une balise avec un type de mouvement aléatoire
-			int baliseType = random.nextInt(4);
-			int x = 50 + random.nextInt(700);
-			int y = OCEAN_START_Y + 50 + random.nextInt(200);
-			
-			Balise balise = new Balise(x, y, random.nextBoolean() ? 1 : -1);
-			BaliseView baliseView = new BaliseView(balise);
-			baliseView.setColor(Color.YELLOW);
-			baliseView.setBounds(balise.getX(), balise.getY(), 30, 30);
-			
-			// Assigner une stratégie de mouvement
-			switch(baliseType) {
-				case 0: // Linéaire
-					balise.setMovingMethod(new LinearMethod(2));
-					break;
-				case 1: // Vertical
-					balise.setMovingMethod(new VerticalMethod(2, OCEAN_START_Y + 30, OCEAN_START_Y + 250));
-					break;
-				case 2: // Sinusoïdal
-					balise.setMovingMethod(new SinusoidalMethod(2, 40, 2));
-					break;
-				case 3: // Statique
-					balise.setMovingMethod(new StaticMethod(x, y));
-					break;
+			try {
+				// Créer une balise avec un type de mouvement aléatoire
+				int baliseType = random.nextInt(4);
+				int x = 50 + random.nextInt(700);
+				int y = OCEAN_START_Y + 50 + random.nextInt(200);
+				
+				Balise balise = new Balise(x, y, random.nextBoolean() ? 1 : -1);
+				BaliseView baliseView = new BaliseView(balise);
+				// La taille est définie automatiquement par BaliseView (30x30)
+				
+				// Assigner une stratégie de mouvement
+				switch(baliseType) {
+					case 0: // Linéaire
+						balise.setMovingMethod(new LinearMethod(2));
+						break;
+					case 1: // Vertical
+						balise.setMovingMethod(new VerticalMethod(2, OCEAN_START_Y + 30, OCEAN_START_Y + 250));
+						break;
+					case 2: // Sinusoïdal
+						balise.setMovingMethod(new SinusoidalMethod(2, 40, 2));
+						break;
+					case 3: // Statique
+						balise.setMovingMethod(new StaticMethod(x, y));
+						break;
+				}
+				
+				balise.registerMoveEvent(baliseView);
+				balises.add(balise);
+				baliseViews.add(baliseView);
+				space.add(baliseView);
+				space.setComponentZOrder(baliseView, 0); // Mettre la balise au premier plan
+				space.revalidate();
+				space.repaint();
+				
+				System.out.println("✨ Balise ajoutée : " + balise.getId() + " (Type: " + 
+					(baliseType == 0 ? "Linéaire" : baliseType == 1 ? "Vertical" : 
+					 baliseType == 2 ? "Sinusoïdal" : "Statique") + ")");
+			} catch (Exception ex) {
+				System.err.println("❌ Erreur lors de la création de la balise: " + ex.getMessage());
+				ex.printStackTrace();
 			}
-			
-			balise.registerMoveEvent(baliseView);
-			balises.add(balise);
-			baliseViews.add(baliseView);
-			space.add(baliseView);
-			space.setComponentZOrder(baliseView, 0); // Mettre la balise au premier plan
-			space.revalidate();
-			space.repaint();
-			
-			System.out.println("✨ Balise ajoutée : " + balise.getId() + " (Type: " + 
-				(baliseType == 0 ? "Linéaire" : baliseType == 1 ? "Vertical" : 
-				 baliseType == 2 ? "Sinusoïdal" : "Statique") + ")");
 		});
 		
 		// Bouton pour ajouter un satellite
 		JButton addSatelliteBtn = new JButton("Ajouter Satellite");
 		addSatelliteBtn.addActionListener(e -> {
-			int x = random.nextInt(800);
-			int y = 50 + random.nextInt(200);
-			int direction = random.nextBoolean() ? 1 : -1;
-			
-			Satellite satellite = new Satellite(x, y, direction);
-			satellite.setScreenWidth(800);
-			SatelliteView satelliteView = new SatelliteView(satellite);
-			satelliteView.setColor(Color.GRAY);
-			satelliteView.setBounds(satellite.getX(), satellite.getY(), 25, 25);
-			
-			satellite.registerMoveEvent(satelliteView);
-			satellites.add(satellite);
-			satelliteViews.add(satelliteView);
-			space.add(satelliteView);
-			space.revalidate();
-			space.repaint();
-			
-			System.out.println("🛰️ Satellite ajouté : " + satellite.getId());
+			try {
+				int x = random.nextInt(800);
+				int y = 50 + random.nextInt(200);
+				int direction = random.nextBoolean() ? 1 : -1;
+				
+				Satellite satellite = new Satellite(x, y, direction);
+				satellite.setScreenWidth(800);
+				SatelliteView satelliteView = new SatelliteView(satellite);
+				// La taille est définie automatiquement par SatelliteView (25x25)
+				
+				satellite.registerMoveEvent(satelliteView);
+				satellites.add(satellite);
+				satelliteViews.add(satelliteView);
+				space.add(satelliteView);
+				space.revalidate();
+				space.repaint();
+				
+				System.out.println("🛰️ Satellite ajouté : " + satellite.getId());
+			} catch (Exception ex) {
+				System.err.println("❌ Erreur lors de la création du satellite: " + ex.getMessage());
+				ex.printStackTrace();
+			}
 		});
 		
 		controlPanel.add(addBaliseBtn);
@@ -187,47 +195,11 @@ public class MainStrategy {
 				}
 
 				// ==================== MISE À JOUR DES COULEURS (VISUEL) ====================
-				// Par défaut, réinitialiser les couleurs
-				for (BaliseView bv : baliseViews) {
-					bv.setColor(Color.YELLOW);
-				}
-				for (SatelliteView sv : satelliteViews) {
-					sv.setColor(Color.GRAY);
-				}
-				// Mettre en vert les paires en synchronisation
-				for (Balise balise : balises) {
-					if (balise.isSynchronizing() && balise.getCurrentSatellite() != null) {
-						Satellite sat = balise.getCurrentSatellite();
-						// Trouver la vue de la balise
-						for (BaliseView bv : baliseViews) {
-							if (bv.getBalise() == balise) {
-								bv.setColor(Color.GREEN);
-								break;
-							}
-						}
-						// Trouver la vue du satellite
-						for (SatelliteView sv : satelliteViews) {
-							if (sv.getSatellite() == sat) {
-								sv.setColor(Color.GREEN);
-								break;
-							}
-						}
-					}
-				}
+				// TODO: Prochaine étape - ajouter effets visuels pour synchronisation
+				// (ex: halo vert, ligne de connexion, etc.)
 				
-				// Mettre à jour les positions visuelles des balises
-				for (int i = 0; i < balises.size(); i++) {
-					Balise b = balises.get(i);
-					BaliseView bv = baliseViews.get(i);
-					bv.setBounds(b.getX(), b.getY(), 30, 30);
-				}
-				
-				// Mettre à jour les positions visuelles des satellites
-				for (int i = 0; i < satellites.size(); i++) {
-					Satellite s = satellites.get(i);
-					SatelliteView sv = satelliteViews.get(i);
-					sv.setBounds(s.getX(), s.getY(), 25, 25);
-				}
+				// Les positions sont mises à jour automatiquement via les listeners
+				// (onBaliseMove et onSatelliteMove)
 				
 				// Forcer repaint du conteneur
 				space.repaint();

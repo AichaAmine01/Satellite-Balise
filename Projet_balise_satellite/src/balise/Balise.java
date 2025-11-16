@@ -16,9 +16,6 @@ public class Balise {
     Announcer announcer;
     private method.MovingMethod movingMethod;
     
-    // Dimensions de la balise
-    private static final int BALISE_SIZE = 30;  // Taille de la balise (largeur et hauteur)
-    
     // Gestion des états
     private BaliseState state;                  // État actuel de la balise
     private int memory;                         // Mémoire actuelle (données collectées)
@@ -33,8 +30,6 @@ public class Balise {
     
     // Gestion de la synchronisation
     private Satellite currentSatellite;         // Satellite actuellement en synchronisation
-    private int transferSpeed;                  // Vitesse de transfert (données par move())
-    private static final int SYNC_TOLERANCE = 50; // Tolérance horizontale pour la synchro (pixels)
     private static final int SYNC_DURATION_MS = 3000; // Durée fixe de la synchronisation (3s)
     private long syncStartTime = 0L;             // Timestamp de début de synchronisation
     private int memoryAtSyncStart = 0;           // Mémoire initiale au début de la synchro
@@ -58,7 +53,6 @@ public class Balise {
         this.collectSpeed = 1 + (int)(Math.random() * 3);      // Vitesse entre 1 et 3 (plus lent)
         this.riseSpeed = 1 + (int)(Math.random() * 3);         // Vitesse de remontée entre 1 et 3
         this.descentSpeed = 1 + (int)(Math.random() * 2);      // Vitesse de descente entre 1 et 2 (lente)
-        this.transferSpeed = 6 + (int)(Math.random() * 5);     // Vitesse de transfert modérée (6 à 10)
         this.initialY = y;                      // Mémoriser la profondeur initiale
         this.currentSatellite = null;           // Pas de satellite en cours
     }
@@ -83,7 +77,6 @@ public class Balise {
         this.collectSpeed = 1 + (int)(Math.random() * 3);      // Vitesse entre 1 et 3 (plus lent)
         this.riseSpeed = 1 + (int)(Math.random() * 3);         // Vitesse de remontée entre 1 et 3
         this.descentSpeed = 1 + (int)(Math.random() * 2);      // Vitesse de descente entre 1 et 2 (lente)
-        this.transferSpeed = 6 + (int)(Math.random() * 5);     // Vitesse de transfert modérée (6 à 10)
         this.initialY = y;                      // Mémoriser la profondeur initiale
         this.currentSatellite = null;           // Pas de satellite en cours
     }
@@ -106,10 +99,14 @@ public class Balise {
             }
         } else if (state == BaliseState.REMONTEE) {
             // Phase de remontée : la balise monte vers la surface (vitesse variable)
-            if (y > SURFACE_Y) {
+            int targetY = SURFACE_Y - 10;  // Position pour que le haut de la balise touche la surface
+            if (y > targetY) {
                 y -= riseSpeed;
+                if (y < targetY) {  // Éviter de dépasser
+                    y = targetY;
+                }
             } else {
-                y = SURFACE_Y;  // Rester à la surface en attente de satellite
+                y = targetY;  // Rester à la surface en attente de satellite
             }
         } else if (state == BaliseState.SYNCHRONISATION) {
             // Phase de synchronisation : durée fixe de 3 secondes avec transfert interpolé
@@ -152,7 +149,8 @@ public class Balise {
      */
     public boolean trySynchronize(Satellite satellite) {
         // Synchronisation stricte : le satellite doit être pile au-dessus
-        if (state == BaliseState.REMONTEE && y == SURFACE_Y && 
+        int targetY = SURFACE_Y - 10;  // Position de surface pour la balise
+        if (state == BaliseState.REMONTEE && y == targetY && 
             satellite.isExactlyAbove(this.x, this.y)) {
             startSynchronisation(satellite);
             return true;
@@ -218,14 +216,13 @@ public class Balise {
     }
 
     public void setX(int x) {
-        // Limiter X dans les bornes de l'écran en tenant compte de la taille de la balise
-        // La balise ne peut pas dépasser les bords avec ses extrémités
+        // Limiter X dans les bornes de l'écran
         if (x < 0) {
             this.x = 0;
             // Inverser la direction quand on touche le bord gauche
             this.direction = -this.direction;
-        } else if (x > SCREEN_WIDTH - BALISE_SIZE) {
-            this.x = SCREEN_WIDTH - BALISE_SIZE;
+        } else if (x > SCREEN_WIDTH) {
+            this.x = SCREEN_WIDTH;
             // Inverser la direction quand on touche le bord droit
             this.direction = -this.direction;
         } else {

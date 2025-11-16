@@ -1,25 +1,42 @@
 package satellite;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
+import java.awt.Image;
+import java.io.File;
+import java.io.IOException;
+import javax.imageio.ImageIO;
 
-import src.nicellipse.component.NiRectangle;
+import src.nicellipse.component.NiImage;
 
-public class SatelliteView extends NiRectangle implements SatelliteListener{
+public class SatelliteView extends NiImage implements SatelliteListener {
 
 	private final Satellite satellite;
-	private Color color = Color.GRAY;
-	private final int w = 25, h = 25;
+	private static final int ICON_WIDTH = 45;
+	private static final int ICON_HEIGHT = 45;
 
 	public Satellite getSatellite() {
 		return this.satellite;
 	}
 
-	public SatelliteView(Satellite satellite) {
+	public SatelliteView(Satellite satellite) throws IOException {
+		super(loadAndResizeSatelliteImage());
 		this.satellite = satellite;
-		this.setBounds(satellite.getX(), satellite.getY(), w, h);
-		this.setOpaque(true);
+		this.setOpaque(false);
+		this.setBounds(satellite.getX(), satellite.getY(), ICON_WIDTH, ICON_HEIGHT);
+	}
+
+	private static Image loadAndResizeSatelliteImage() throws IOException {
+		// Essai dans resources/
+		File f = new File("resources" + File.separator + "satellite.png");
+		if (!f.exists()) {
+			// Essai chemin alternatif
+			f = new File("Projet_balise_satellite" + File.separator + "resources" + File.separator + "satellite.png");
+			if (!f.exists()) {
+				throw new IOException("satellite.png not found in resources");
+			}
+		}
+		// Charger et redimensionner l'image
+		Image originalImage = ImageIO.read(f);
+		return originalImage.getScaledInstance(ICON_WIDTH, ICON_HEIGHT, Image.SCALE_SMOOTH);
 	}
 
 	@Override
@@ -27,24 +44,8 @@ public class SatelliteView extends NiRectangle implements SatelliteListener{
 		Satellite source = (Satellite) event.getSource();
 		int x = source.getX();
 		int y = source.getY();
-		this.setBounds(x, y, w, h);
+		this.setBounds(x, y, ICON_WIDTH, ICON_HEIGHT);
 		this.revalidate();
 		this.repaint();
-	}
-
-	@Override
-	protected void paintComponent(Graphics g) {
-		super.paintComponent(g);
-		g.setColor(color);
-		g.fillRect(0, 0, getWidth(), getHeight());
-	}
-
-	public Dimension getPreferredSize() {
-		return new Dimension(w, h);
-	}
-
-	public void setColor(Color c) {
-		this.color = c;
-		repaint();
 	}
 }
