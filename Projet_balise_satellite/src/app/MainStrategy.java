@@ -170,9 +170,9 @@ public class MainStrategy {
 				}
 
 				// Déplacer les satellites (dans l'espace)
-				s1.move(3);
-				s2.move(2);
-				s3.move(2);
+				s1.move(1);
+				s2.move(1);
+				s3.move(1);
 				
 				// ==================== DÉTECTION ET SYNCHRONISATION ====================
 				// Pour chaque balise en attente (REMONTEE), vérifier les satellites disponibles
@@ -193,6 +193,35 @@ public class MainStrategy {
 						System.out.println("🔄 TRANSFERT: " + balise.getId() + 
 						                   " -> " + balise.getCurrentSatellite().getId() + 
 						                   " (Mémoire restante: " + balise.getMemory() + ")");
+					}
+				}
+
+				// ==================== MISE À JOUR DES COULEURS (VISUEL) ====================
+				// Par défaut, réinitialiser les couleurs
+				for (BaliseView bv : baliseViews) {
+					bv.setColor(Color.YELLOW);
+				}
+				for (SatelliteView sv : satelliteViews) {
+					sv.setColor(Color.GRAY);
+				}
+				// Mettre en vert les paires en synchronisation
+				for (Balise balise : balises) {
+					if (balise.isSynchronizing() && balise.getCurrentSatellite() != null) {
+						Satellite sat = balise.getCurrentSatellite();
+						// Trouver la vue de la balise
+						for (BaliseView bv : baliseViews) {
+							if (bv.getBalise() == balise) {
+								bv.setColor(Color.GREEN);
+								break;
+							}
+						}
+						// Trouver la vue du satellite
+						for (SatelliteView sv : satelliteViews) {
+							if (sv.getSatellite() == sat) {
+								sv.setColor(Color.GREEN);
+								break;
+							}
+						}
 					}
 				}
 				
