@@ -34,7 +34,7 @@ public class Balise {
     // Gestion de la synchronisation
     private Satellite currentSatellite;         // Satellite actuellement en synchronisation
     private int transferSpeed;                  // Vitesse de transfert (données par move())
-    private static final int SYNC_TOLERANCE = 50; // Tolérance horizontale pour la synchro (pixels)
+    private static final int SYNC_TOLERANCE = 10; // Tolérance horizontale pour la synchro (pixels)
 
     /**
      * Constructeur simple de la balise
@@ -275,6 +275,23 @@ public class Balise {
     public void setState(BaliseState newState) {
         if (this.state != newState) {
             this.state = newState;
+            
+            // Messages console pour suivre le cycle
+            switch (newState) {
+                case COLLECTE:
+                    System.out.println("🔵 " + id + " : DESCENTE terminée → Début COLLECTE (profondeur: " + y + ")");
+                    break;
+                case REMONTEE:
+                    System.out.println("⬆️  " + id + " : Mémoire PLEINE (" + memory + "/" + maxMemory + ") → REMONTÉE vers surface");
+                    break;
+                case SYNCHRONISATION:
+                    System.out.println("🔄 " + id + " : À la surface → Début SYNCHRONISATION");
+                    break;
+                case DESCENTE:
+                    System.out.println("⬇️  " + id + " : Synchronisation terminée → DESCENTE vers profondeur " + initialY);
+                    break;
+            }
+            
             // Émettre un événement de changement d'état
             announcer.announce(new BaliseStateChangeEvent(this));
         }

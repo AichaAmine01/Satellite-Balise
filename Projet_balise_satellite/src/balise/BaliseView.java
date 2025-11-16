@@ -6,9 +6,11 @@ import java.awt.Graphics;
 
 import src.nicellipse.component.NiRectangle;
 
-public class BaliseView extends NiRectangle implements BaliseListener {
+public class BaliseView extends NiRectangle implements BaliseListener, SynchronisationListener {
     private final Balise balise;
     private Color color = Color.YELLOW;
+    private Color normalColor = Color.YELLOW;
+    private Color syncColor = Color.GREEN; // Couleur pendant la synchronisation
     private int w = 30, h = 30;
 
     public BaliseView(Balise balise) {
@@ -46,6 +48,22 @@ public class BaliseView extends NiRectangle implements BaliseListener {
 
     public Dimension getPreferredSize() {
         return new Dimension(w, h);
+    }
+
+    @Override
+    public void onSynchronisationStart(SynchronisationStartEvent event) {
+        // Changer la couleur en vert pendant la synchronisation
+        color = syncColor;
+        repaint();
+        System.out.println("🟢 Vue: " + balise.getId() + " commence la synchronisation (vert)");
+    }
+
+    @Override
+    public void onSynchronisationEnd(SynchronisationEndEvent event) {
+        // Revenir à la couleur normale après la synchronisation
+        color = normalColor;
+        repaint();
+        System.out.println("🟡 Vue: " + balise.getId() + " termine la synchronisation (jaune)");
     }
 
 }
