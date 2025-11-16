@@ -35,6 +35,9 @@ public class Balise {
     private Satellite currentSatellite;         // Satellite actuellement en synchronisation
     private int transferSpeed;                  // Vitesse de transfert (données par move())
     private static final int SYNC_TOLERANCE = 50; // Tolérance horizontale pour la synchro (pixels)
+    private static final int SYNC_DURATION_MS = 3000; // Durée fixe de la synchronisation (3s)
+    private long syncStartTime = 0L;             // Timestamp de début de synchronisation
+    private int memoryAtSyncStart = 0;           // Mémoire initiale au début de la synchro
 
     /**
      * Constructeur simple de la balise
@@ -51,11 +54,11 @@ public class Balise {
         this.state = BaliseState.COLLECTE;      // État initial : collecte
         this.memory = 0;                        // Mémoire initialement vide
         // Variabilité : chaque balise a des caractéristiques différentes
-        this.maxMemory = 150 + (int)(Math.random() * 150);     // Capacité entre 150 et 300
+        this.maxMemory = 350 + (int)(Math.random() * 350);     // Capacité entre 250 et 500 (durée prolongée)
         this.collectSpeed = 1 + (int)(Math.random() * 3);      // Vitesse entre 1 et 3 (plus lent)
         this.riseSpeed = 1 + (int)(Math.random() * 3);         // Vitesse de remontée entre 1 et 3
         this.descentSpeed = 1 + (int)(Math.random() * 2);      // Vitesse de descente entre 1 et 2 (lente)
-        this.transferSpeed = 5 + (int)(Math.random() * 10);    // Vitesse de transfert entre 5 et 14
+        this.transferSpeed = 6 + (int)(Math.random() * 5);     // Vitesse de transfert modérée (6 à 10)
         this.initialY = y;                      // Mémoriser la profondeur initiale
         this.currentSatellite = null;           // Pas de satellite en cours
     }
@@ -76,11 +79,11 @@ public class Balise {
         this.state = BaliseState.COLLECTE;      // État initial : collecte
         this.memory = 0;                        // Mémoire initialement vide
         // Variabilité : chaque balise a des caractéristiques différentes
-        this.maxMemory = 150 + (int)(Math.random() * 150);     // Capacité entre 150 et 300
+        this.maxMemory = 250 + (int)(Math.random() * 250);     // Capacité entre 250 et 500 (durée prolongée)
         this.collectSpeed = 1 + (int)(Math.random() * 3);      // Vitesse entre 1 et 3 (plus lent)
         this.riseSpeed = 1 + (int)(Math.random() * 3);         // Vitesse de remontée entre 1 et 3
         this.descentSpeed = 1 + (int)(Math.random() * 2);      // Vitesse de descente entre 1 et 2 (lente)
-        this.transferSpeed = 5 + (int)(Math.random() * 10);    // Vitesse de transfert entre 5 et 14
+        this.transferSpeed = 6 + (int)(Math.random() * 5);     // Vitesse de transfert modérée (6 à 10)
         this.initialY = y;                      // Mémoriser la profondeur initiale
         this.currentSatellite = null;           // Pas de satellite en cours
     }
@@ -109,14 +112,19 @@ public class Balise {
                 y = SURFACE_Y;  // Rester à la surface en attente de satellite
             }
         } else if (state == BaliseState.SYNCHRONISATION) {
-            // Phase de synchronisation : transfert des données vers le satellite
-            if (currentSatellite != null && memory > 0) {
-                int dataToTransfer = Math.min(transferSpeed, memory);
-                memory -= dataToTransfer;
-                currentSatellite.receiveData(dataToTransfer);
-                
-                // Si toutes les données sont transférées, terminer la synchronisation
-                if (memory == 0) {
+            // Phase de synchronisation : durée fixe de 3 secondes avec transfert interpolé
+            if (currentSatellite != null) {
+                long elapsed = System.currentTimeMillis() - syncStartTime;
+                double progress = Math.min(1.0, (double) elapsed / SYNC_DURATION_MS);
+                // Transfert linéaire : mémoire restante proportionnelle au temps écoulé
+                int newMemory = (int) Math.round(memoryAtSyncStart * (1 - progress));
+                int transferred = memory - newMemory;
+                if (transferred > 0) {
+                    currentSatellite.receiveData(transferred);
+                }
+                memory = newMemory;
+                if (progress >= 1.0) {
+                    memory = 0; // S'assurer que tout est transféré
                     endSynchronisation();
                 }
             }
@@ -143,11 +151,9 @@ public class Balise {
      * @return true si la synchronisation a démarré, false sinon
      */
     public boolean trySynchronize(Satellite satellite) {
-        // Conditions pour la synchronisation :
-        // 1. La balise doit être en état REMONTEE et à la surface
-        // 2. Le satellite doit être disponible et au-dessus de la balise
+        // Synchronisation stricte : le satellite doit être pile au-dessus
         if (state == BaliseState.REMONTEE && y == SURFACE_Y && 
-            satellite.isAbove(this.x, this.y, SYNC_TOLERANCE)) {
+            satellite.isExactlyAbove(this.x, this.y)) {
             startSynchronisation(satellite);
             return true;
         }
@@ -158,8 +164,14 @@ public class Balise {
      * Démarre la synchronisation avec un satellite
      */
     private void startSynchronisation(Satellite satellite) {
+        // Essayer de réserver le satellite pour garantir l'exclusivité
+        if (!satellite.lock(this)) {
+            return; // Le satellite est déjà pris par une autre balise
+        }
         this.currentSatellite = satellite;
-        satellite.setDisponible(false);  // Le satellite devient occupé
+        // satellite reste mobile pendant la synchronisation
+        this.syncStartTime = System.currentTimeMillis();
+        this.memoryAtSyncStart = memory; // Capturer la mémoire totale à transférer
         setState(BaliseState.SYNCHRONISATION);
         // Émettre l'événement de début de synchronisation
         announcer.announce(new SynchronisationStartEvent(this, satellite));
@@ -172,7 +184,8 @@ public class Balise {
         if (currentSatellite != null) {
             // Émettre l'événement de fin de synchronisation
             announcer.announce(new SynchronisationEndEvent(this, currentSatellite));
-            currentSatellite.setDisponible(true);  // Le satellite redevient disponible
+            currentSatellite.unlock(this);  // Libérer le satellite (redevient disponible)
+            // satellite reste mobile pendant la synchronisation
             currentSatellite = null;
         }
         // Passer en mode DESCENTE pour redescendre progressivement
@@ -225,14 +238,13 @@ public class Balise {
     }
 
     public void setY(int y) {
-        // Limiter Y dans la zone océan en tenant compte de la taille de la balise
-        // La balise ne peut pas dépasser les bords avec ses extrémités
+        // Limiter Y dans la zone océan (toute la profondeur disponible)
         if (state == BaliseState.COLLECTE || state == BaliseState.DESCENTE) {
-            // En collecte ou descente, rester entre la surface et le fond
+            // En collecte ou descente, rester entre la surface et le fond complet
             if (y < SURFACE_Y) {
                 this.y = SURFACE_Y;
-            } else if (y > OCEAN_BOTTOM - BALISE_SIZE) {
-                this.y = OCEAN_BOTTOM - BALISE_SIZE;
+            } else if (y > OCEAN_BOTTOM) {
+                this.y = OCEAN_BOTTOM;
             } else {
                 this.y = y;
             }
@@ -240,8 +252,8 @@ public class Balise {
             // En remontée ou synchronisation, peut être à la surface
             if (y < SURFACE_Y) {
                 this.y = SURFACE_Y;
-            } else if (y > OCEAN_BOTTOM - BALISE_SIZE) {
-                this.y = OCEAN_BOTTOM - BALISE_SIZE;
+            } else if (y > OCEAN_BOTTOM) {
+                this.y = OCEAN_BOTTOM;
             } else {
                 this.y = y;
             }

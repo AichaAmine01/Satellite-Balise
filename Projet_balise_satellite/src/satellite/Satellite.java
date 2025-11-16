@@ -1,6 +1,7 @@
 package satellite;
 
 import announcer.Announcer;
+import balise.Balise;
 
 /**
  * Classe représentant un satellite en orbite.
@@ -13,6 +14,8 @@ public class Satellite {
 	private boolean disponible;           // Indique si le satellite peut recevoir des données
 	private int dataReceived;             // Quantité de données reçues
 	private int screenWidth;              // Largeur de l'écran pour la boucle
+	private Balise lockedBy;              // Balise actuellement synchronisée (exclusivité)
+	private boolean frozen;               // Satellite figé pendant une synchronisation
 	Announcer announcer;
 	
 	public Satellite(int x, int y, int direction) {
@@ -23,6 +26,8 @@ public class Satellite {
 		this.disponible = true;           // Initialement disponible
 		this.dataReceived = 0;
 		this.screenWidth = 800;           // Valeur par défaut
+		this.lockedBy = null;
+		this.frozen = false;
 		this.announcer = new Announcer();
 	}
 	
@@ -34,6 +39,8 @@ public class Satellite {
 		this.disponible = true;
 		this.dataReceived = 0;
 		this.screenWidth = 800;           // Valeur par défaut
+		this.lockedBy = null;
+		this.frozen = false;
 		this.announcer = new Announcer();
 	}
 	
@@ -50,7 +57,9 @@ public class Satellite {
 	 * @param gap Distance de déplacement
 	 */
 	public void move(int gap) {
-		this.x = this.x + (direction * gap);
+		if (!frozen) {
+			this.x = this.x + (direction * gap);
+		}
 		
 		// Gestion de la boucle : si le satellite sort de l'écran, il réapparaît de l'autre côté
 		if (this.x > screenWidth) {
@@ -73,9 +82,9 @@ public class Satellite {
 	 * @param tolerance Tolérance horizontale pour la synchronisation
 	 * @return true si le satellite peut se synchroniser avec la balise
 	 */
-	public boolean isAbove(int baliseX, int baliseY, int tolerance) {
-		// Le satellite doit être disponible et proche horizontalement
-		return disponible && Math.abs(this.x - baliseX) <= tolerance;
+	public boolean isExactlyAbove(int baliseX, int baliseY) {
+		// Synchronisation stricte : le satellite doit être libre et pile au-dessus
+		return !isBusy() && this.x == baliseX;
 	}
 	
 	/**
@@ -126,8 +135,46 @@ public class Satellite {
 		this.disponible = disponible;
 	}
 
+	/**
+	 * Tente de réserver le satellite pour une balise (exclusivité).
+	 * @return true si le verrou est pris par cette balise, false sinon.
+	 */
+	public synchronized boolean lock(Balise balise) {
+		if (this.lockedBy == null) {
+			this.lockedBy = balise;
+			this.disponible = false;
+			return true;
+		}
+		return this.lockedBy == balise; // idempotent si déjà verrouillé par la même balise
+	}
+
+	/**
+	 * Libère le satellite si verrouillé par la balise donnée.
+	 */
+	public synchronized void unlock(Balise balise) {
+		if (this.lockedBy == balise) {
+			this.lockedBy = null;
+			this.disponible = true;
+		}
+	}
+
+	public synchronized boolean isBusy() {
+		return this.lockedBy != null;
+	}
+
+	public synchronized Balise getLockedBy() {
+		return this.lockedBy;
+	}
+
 	public int getDataReceived() {
 		return dataReceived;
+	}
+	public boolean isFrozen() {
+		return frozen;
+	}
+
+	public void setFrozen(boolean frozen) {
+		this.frozen = frozen;
 	}
 
 	public void setDataReceived(int dataReceived) {

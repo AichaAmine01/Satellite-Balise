@@ -12,6 +12,10 @@ public class SatelliteView extends NiRectangle implements SatelliteListener{
 	private Color color = Color.GRAY;
 	private final int w = 25, h = 25;
 
+	public Satellite getSatellite() {
+		return this.satellite;
+	}
+
 	public SatelliteView(Satellite satellite) {
 		this.satellite = satellite;
 		this.setBounds(satellite.getX(), satellite.getY(), w, h);
@@ -37,5 +41,10 @@ public class SatelliteView extends NiRectangle implements SatelliteListener{
 
 	public Dimension getPreferredSize() {
 		return new Dimension(w, h);
+	}
+
+	public void setColor(Color c) {
+		this.color = c;
+		repaint();
 	}
 }

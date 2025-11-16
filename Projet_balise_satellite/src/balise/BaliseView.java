@@ -48,4 +48,5 @@ public class BaliseView extends NiRectangle implements BaliseListener {
         return new Dimension(w, h);
     }
 
+
 }
