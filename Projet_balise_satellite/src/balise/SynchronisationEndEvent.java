@@ -26,4 +26,11 @@ public class SynchronisationEndEvent extends AbstractEvent {
     public String toString() {
         return "SynchronisationEndEvent [Balise: " + getBalise().getId() + ", Satellite: " + satellite.getId() + "]";
     }
+    
+    @Override
+    public void sentTo(Object target) {
+        if (target instanceof SynchronisationListener) {
+            ((SynchronisationListener) target).onSynchronisationEnd(this);
+        }
+    }
 }

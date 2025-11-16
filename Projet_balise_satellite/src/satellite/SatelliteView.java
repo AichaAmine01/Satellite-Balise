@@ -4,12 +4,17 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 
+import balise.SynchronisationEndEvent;
+import balise.SynchronisationListener;
+import balise.SynchronisationStartEvent;
 import src.nicellipse.component.NiRectangle;
 
-public class SatelliteView extends NiRectangle implements SatelliteListener{
+public class SatelliteView extends NiRectangle implements SatelliteListener, SynchronisationListener {
 
 	private final Satellite satellite;
 	private Color color = Color.GRAY;
+	private Color normalColor = Color.GRAY;
+	private Color syncColor = Color.ORANGE; // Couleur pendant la synchronisation
 	private final int w = 25, h = 25;
 
 	public SatelliteView(Satellite satellite) {
@@ -37,5 +42,25 @@ public class SatelliteView extends NiRectangle implements SatelliteListener{
 
 	public Dimension getPreferredSize() {
 		return new Dimension(w, h);
+	}
+
+	public Satellite getSatellite() {
+		return satellite;
+	}
+
+	@Override
+	public void onSynchronisationStart(SynchronisationStartEvent event) {
+		// Changer la couleur en orange pendant la synchronisation
+		color = syncColor;
+		repaint();
+		System.out.println("🟠 Vue Satellite: " + satellite.getId() + " en synchronisation (orange)");
+	}
+
+	@Override
+	public void onSynchronisationEnd(SynchronisationEndEvent event) {
+		// Revenir à la couleur normale après la synchronisation
+		color = normalColor;
+		repaint();
+		System.out.println("⚪ Vue Satellite: " + satellite.getId() + " termine la synchronisation (gris)");
 	}
 }
