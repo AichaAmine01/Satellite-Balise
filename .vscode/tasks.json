@@ -1,0 +1,53 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Compiler Satellite-Balise",
+            "type": "shell",
+            "command": "javac",
+            "args": [
+                "-encoding",
+                "UTF-8",
+                "-cp",
+                "bin",
+                "-d",
+                "bin",
+                "-sourcepath",
+                "src",
+                "src/app/MainStrategy.java"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/Projet_balise_satellite"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "silent",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Compiler et Lancer",
+            "dependsOn": "Compiler Satellite-Balise",
+            "type": "shell",
+            "command": "java",
+            "args": [
+                "-cp",
+                "bin",
+                "app.MainStrategy"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/Projet_balise_satellite"
+            },
+            "group": "none",
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            },
+            "problemMatcher": []
+        }
+    ]
+}

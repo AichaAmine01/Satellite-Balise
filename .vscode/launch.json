@@ -1,0 +1,18 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Lancer Application Satellite-Balise",
+            "request": "launch",
+            "mainClass": "app.MainStrategy",
+            "projectName": "Satellite-Balise",
+            "cwd": "${workspaceFolder}/Projet_balise_satellite",
+            "classPaths": [
+                "${workspaceFolder}/Projet_balise_satellite/bin"
+            ],
+            "encoding": "UTF-8",
+            "console": "integratedTerminal"
+        }
+    ]
+}
