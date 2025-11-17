@@ -122,7 +122,7 @@ public class MainStrategy {
 		addSatelliteBtn.addActionListener(e -> {
 			try {
 				int x = random.nextInt(800);
-				int y = 50 + random.nextInt(200);
+				int y = 30 + random.nextInt(150);  // Entre 30 et 180 pour rester dans l'espace aérien
 				int direction = random.nextBoolean() ? 1 : -1;
 				
 				Satellite satellite = new Satellite(x, y, direction);
