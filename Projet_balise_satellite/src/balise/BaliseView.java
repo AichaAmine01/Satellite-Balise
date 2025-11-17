@@ -1,23 +1,41 @@
 package balise;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
+import java.awt.Image;
+import java.io.File;
+import java.io.IOException;
+import javax.imageio.ImageIO;
 
-import src.nicellipse.component.NiRectangle;
+import src.nicellipse.component.NiImage;
 
-public class BaliseView extends NiRectangle implements BaliseListener, SynchronisationListener {
+public class BaliseView extends NiImage implements BaliseListener, SynchronisationListener {
     private final Balise balise;
-    private Color color = Color.YELLOW;
-    private Color normalColor = Color.YELLOW;
-    private Color syncColor = Color.GREEN; // Couleur pendant la synchronisation
-    private int w = 30, h = 30;
+    private static final int ICON_WIDTH = 50;
+    private static final int ICON_HEIGHT = 50;
 
-    public BaliseView(Balise balise) {
+    public Balise getBalise() {
+        return this.balise;
+    }
+
+    public BaliseView(Balise balise) throws IOException {
+        super(loadAndResizeBaliseImage());
         this.balise = balise;
-        // initialisation minimale de taille
-        this.setBounds(balise.getX(), balise.getY(), w, h);
-        this.setOpaque(true);
+        this.setOpaque(false);
+        this.setBounds(balise.getX(), balise.getY(), ICON_WIDTH, ICON_HEIGHT);
+    }
+
+    private static Image loadAndResizeBaliseImage() throws IOException {
+        // Essai dans resources/
+        File f = new File("resources" + File.separator + "balise.png");
+        if (!f.exists()) {
+            // Essai chemin alternatif
+            f = new File("Projet_balise_satellite" + File.separator + "resources" + File.separator + "balise.png");
+            if (!f.exists()) {
+                throw new IOException("balise.png not found in resources");
+            }
+        }
+        // Charger et redimensionner l'image
+        Image originalImage = ImageIO.read(f);
+        return originalImage.getScaledInstance(ICON_WIDTH, ICON_HEIGHT, Image.SCALE_SMOOTH);
     }
 
     @Override
@@ -25,45 +43,20 @@ public class BaliseView extends NiRectangle implements BaliseListener, Synchroni
         Balise source = (Balise) event.getSource();
         int x = source.getX();
         int y = source.getY();
-        this.setBounds(x, y, w, h);
+        this.setBounds(x, y, ICON_WIDTH, ICON_HEIGHT);
         this.revalidate();
         this.repaint();
     }
 
-    public Balise getBalise() {
-        return balise;
-    }
-
-    @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        g.setColor(color);
-        g.fillRect(0, 0, getWidth(), getHeight());
-    }
-
-    public void setColor(Color c) {
-        this.color = c;
-        repaint();
-    }
-
-    public Dimension getPreferredSize() {
-        return new Dimension(w, h);
-    }
-
     @Override
     public void onSynchronisationStart(SynchronisationStartEvent event) {
-        // Changer la couleur en vert pendant la synchronisation
-        color = syncColor;
-        repaint();
-        System.out.println("🟢 Vue: " + balise.getId() + " commence la synchronisation (vert)");
+        System.out.println("🟢 Vue: " + balise.getId() + " commence la synchronisation");
     }
 
     @Override
     public void onSynchronisationEnd(SynchronisationEndEvent event) {
-        // Revenir à la couleur normale après la synchronisation
-        color = normalColor;
-        repaint();
-        System.out.println("🟡 Vue: " + balise.getId() + " termine la synchronisation (jaune)");
+        System.out.println("🟡 Vue: " + balise.getId() + " termine la synchronisation");
     }
 
 }
+

@@ -3,6 +3,7 @@ package app;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JPanel;
@@ -29,7 +30,7 @@ public class MainStrategy {
 	
 	private static final int OCEAN_START_Y = 300;  // Y où commence l'océan
 	
-	public static void main(String[] args) throws InterruptedException {
+	public static void main(String[] args) throws InterruptedException, IOException {
 		// Créer la fenêtre principale
 		NiSpace space = new NiSpace("Simulation Balises & Satellites", new Dimension(800, 600));
 		space.setBackground(Color.WHITE);
@@ -50,9 +51,6 @@ public class MainStrategy {
 		Satellite s1 = new Satellite(100, 50, 1);
 		s1.setScreenWidth(800);  // Configurer la largeur de l'écran
 		SatelliteView sv1 = new SatelliteView(s1);
-		sv1.setBackground(Color.GRAY);
-		sv1.setSize(25, 25);
-		sv1.setLocation(s1.getX(), s1.getY());
 		s1.registerMoveEvent(sv1);
 		satellites.add(s1);
 		satelliteViews.add(sv1);
@@ -60,9 +58,6 @@ public class MainStrategy {
 		Satellite s2 = new Satellite(400, 100, -1);
 		s2.setScreenWidth(800);  // Configurer la largeur de l'écran
 		SatelliteView sv2 = new SatelliteView(s2);
-		sv2.setBackground(Color.GRAY);
-		sv2.setSize(25, 25);
-		sv2.setLocation(s2.getX(), s2.getY());
 		s2.registerMoveEvent(sv2);
 		satellites.add(s2);
 		satelliteViews.add(sv2);
@@ -70,9 +65,6 @@ public class MainStrategy {
 		Satellite s3 = new Satellite(650, 150, 1);
 		s3.setScreenWidth(800);  // Configurer la largeur de l'écran
 		SatelliteView sv3 = new SatelliteView(s3);
-		sv3.setBackground(Color.GRAY);
-		sv3.setSize(25, 25);
-		sv3.setLocation(s3.getX(), s3.getY());
 		s3.registerMoveEvent(sv3);
 		satellites.add(s3);
 		satelliteViews.add(sv3);
@@ -102,9 +94,6 @@ public class MainStrategy {
 		// Balise 1 : Mouvement linéaire horizontal (EN PROFONDEUR)
 		Balise b1 = new Balise(100, OCEAN_START_Y + 200, 1, "Balise_Linear"); // Y=500 (profondeur)
 		BaliseView bv1 = new BaliseView(b1);
-		bv1.setBackground(Color.YELLOW);
-		bv1.setSize(30, 30);
-		bv1.setLocation(b1.getX(), b1.getY());
 		b1.setMovingMethod(new LinearMethod(2));
 		b1.registerMoveEvent(bv1);
 		b1.registerSynchronisationStartEvent(bv1); // Enregistrer pour changement de couleur
@@ -117,9 +106,6 @@ public class MainStrategy {
 		// Balise 2 : Mouvement statique (immobile EN PROFONDEUR)
 		Balise b2 = new Balise(300, OCEAN_START_Y + 220, 0, "Balise_Static"); // Y=520 (profondeur)
 		BaliseView bv2 = new BaliseView(b2);
-		bv2.setBackground(Color.YELLOW);
-		bv2.setSize(30, 30);
-		bv2.setLocation(b2.getX(), b2.getY());
 		b2.setMovingMethod(new StaticMethod(300, OCEAN_START_Y + 220)); // Profondeur fixe
 		b2.registerMoveEvent(bv2);
 		b2.registerSynchronisationStartEvent(bv2);
@@ -132,9 +118,6 @@ public class MainStrategy {
 		// Balise 3 : Mouvement sinusoïdal (EN PROFONDEUR)
 		Balise b3 = new Balise(450, OCEAN_START_Y + 180, 1, "Balise_Sinusoidal"); // Y=480 (profondeur)
 		BaliseView bv3 = new BaliseView(b3);
-		bv3.setBackground(Color.YELLOW);
-		bv3.setSize(30, 30);
-		bv3.setLocation(b3.getX(), b3.getY());
 		b3.setMovingMethod(new SinusoidalMethod(2, 40, 2)); // Ondule en profondeur
 		b3.registerMoveEvent(bv3);
 		b3.registerSynchronisationStartEvent(bv3);
@@ -147,9 +130,6 @@ public class MainStrategy {
 		// Balise 4 : Mouvement vertical (YO-YO en profondeur)
 		Balise b4 = new Balise(600, OCEAN_START_Y + 200, 1, "Balise_Vertical"); // Y=500 (profondeur)
 		BaliseView bv4 = new BaliseView(b4);
-		bv4.setBackground(Color.YELLOW);
-		bv4.setSize(30, 30);
-		bv4.setLocation(b4.getX(), b4.getY());
 		// Yo-yo entre profondeur moyenne (450) et grande profondeur (550)
 		b4.setMovingMethod(new VerticalMethod(2, OCEAN_START_Y + 150, OCEAN_START_Y + 250));
 		b4.registerMoveEvent(bv4);
@@ -224,16 +204,8 @@ public class MainStrategy {
 					}
 				}
 				
-				// Mettre à jour les positions visuelles des balises
-				bv1.setBounds(b1.getX(), b1.getY(), 30, 30);
-				bv2.setBounds(b2.getX(), b2.getY(), 30, 30);
-				bv3.setBounds(b3.getX(), b3.getY(), 30, 30);
-				bv4.setBounds(b4.getX(), b4.getY(), 30, 30);
-				
-				// Mettre à jour les positions visuelles des satellites
-				sv1.setBounds(s1.getX(), s1.getY(), 25, 25);
-				sv2.setBounds(s2.getX(), s2.getY(), 25, 25);
-				sv3.setBounds(s3.getX(), s3.getY(), 25, 25);
+				// Les positions visuelles sont mises à jour automatiquement via les événements
+				// (onBaliseMove et onSatelliteMove)
 				
 				// Forcer repaint du conteneur
 				space.repaint();

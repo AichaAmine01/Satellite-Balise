@@ -25,7 +25,7 @@ public class Balise {
     private int maxMemory;                      // Capacité maximale de mémoire
     private int collectSpeed;                   // Vitesse de collecte (données par move())
     private int initialY;                       // Position Y initiale (profondeur maximale)
-    private static final int SURFACE_Y = 300;  // Y où se trouve la surface de l'océan
+    private static final int SURFACE_Y = 290;  // Y où se trouve la surface de l'océan (10 pixels plus haut)
     private static final int OCEAN_BOTTOM = 600; // Fond de l'océan
     private static final int SCREEN_WIDTH = 800;  // Largeur de l'écran
     private int riseSpeed;                      // Vitesse de remontée en pixels par move()

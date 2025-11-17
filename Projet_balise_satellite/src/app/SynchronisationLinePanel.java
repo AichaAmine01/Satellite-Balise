@@ -1,17 +1,16 @@
 package app;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.BasicStroke;
-import java.util.HashMap;
-import java.util.Map;
-import javax.swing.JPanel;
-
 import balise.Balise;
 import balise.SynchronisationEndEvent;
 import balise.SynchronisationListener;
 import balise.SynchronisationStartEvent;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.util.HashMap;
+import java.util.Map;
+import javax.swing.JPanel;
 import satellite.Satellite;
 
 /**
@@ -65,10 +64,10 @@ public class SynchronisationLinePanel extends JPanel implements SynchronisationL
         
         // Dessiner une ligne pour chaque synchronisation active
         for (SyncPair pair : activeSynchronisations.values()) {
-            int baliseX = pair.balise.getX() + 15; // Centre de la balise (30/2)
-            int baliseY = pair.balise.getY() + 15;
-            int satelliteX = pair.satellite.getX() + 12; // Centre du satellite (25/2)
-            int satelliteY = pair.satellite.getY() + 12;
+            int baliseX = pair.balise.getX() + 25; // Centre de la balise (50/2)
+            int baliseY = pair.balise.getY(); // Haut de la balise
+            int satelliteX = pair.satellite.getX() + 22; // Centre horizontal du satellite (45/2)
+            int satelliteY = pair.satellite.getY() + 45; // Bas du satellite (hauteur 45)
             
             g2d.drawLine(baliseX, baliseY, satelliteX, satelliteY);
         }
