@@ -148,6 +148,13 @@ public class Balise {
         // 2. Le satellite doit être disponible et au-dessus de la balise
         if (state == BaliseState.REMONTEE && y == SURFACE_Y && 
             satellite.isAbove(this.x, this.y, SYNC_TOLERANCE)) {
+            
+            // 🔍 DEBUG: Afficher les positions pour détecter les faux positifs
+            int distance = Math.abs(satellite.getX() - this.x);
+            System.out.println("🔗 SYNCHRO DÉTECTÉE: " + this.id + 
+                             " (X=" + this.x + ") <-> " + satellite.getId() + 
+                             " (X=" + satellite.getX() + ") Distance=" + distance);
+            
             startSynchronisation(satellite);
             return true;
         }
