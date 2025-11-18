@@ -243,6 +243,15 @@ Diagramme de classes complet montrant les 4 packages principaux (MODÈLE, VUE, C
 
 ---
 
+### Diagramme d'état
+
+**Diagramme de classes complet**
+
+![Diagramme de classes](Projet_balise_satellite/resources/diagramme d'état)
+
+Diagramme de classes complet montrant les 4 packages principaux (MODÈLE, VUE, CONTRÔLEUR, OBSERVABLE/OBSERVATEUR).
+
+---
 ### Diagrammes de séquence
 
 #### Phase COLLECTE
