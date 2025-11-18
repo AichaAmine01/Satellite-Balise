@@ -394,11 +394,7 @@ Mise à jour de la vue
 5. Listener reçoit l'événement : `listener.onBaliseMove(event)`
 6. Vue se met à jour : `repaint()`
 
-**Avantages** :
-- Découplage modèle-vue (MVC)
-- Ajout de nouvelles vues sans modifier les modèles
-- Communication 1-N (un modèle, plusieurs vues)
-- Facilite les tests (mock des listeners)
+
 
 ---
 
@@ -419,10 +415,7 @@ event.sentTo(listener); // Premier dispatch : type d'événement
 ((BaliseListener) listener).onBaliseMove(this); // Second dispatch : type de listener
 ```
 
-**Avantages** :
-- Évite les castings dangereux côté Announcer
-- Type-safety : chaque événement connaît son interface de listener
-- Facilite l'ajout de nouveaux types d'événements
+
 
 ---
 
@@ -452,26 +445,51 @@ event.sentTo(listener); // Premier dispatch : type d'événement
 
 ---
 
-## 📊 Diagrammes Disponibles
+## 📊 Diagrammes UML
 
-Le dossier contient 4 diagrammes UML PlantUML :
+### Diagramme d'architecture
 
-1. **`diagramme-architecture-globale.puml`** ⭐ **RECOMMANDÉ**
-   - Vue 3 packages (MODÈLE, OBSERVABLE, VUE)
-   - Idéal pour présenter l'architecture générale
+**Diagramme de classes complet**
 
-2. **`diagramme-3-patterns.puml`**
-   - Chaque pattern isolé dans son package
-   - Idéal pour expliquer chaque pattern individuellement
+![Diagramme de classes](Projet_balise_satellite/resources/diagramme%20de%20classe.png)
 
-3. **`diagramme-architecture-essentielle.puml`**
-   - Toutes les classes avec méthodes essentielles
-   - Vue détaillée complète
+Diagramme de classes complet montrant les 4 packages principaux (MODÈLE, VUE, CONTRÔLEUR, OBSERVABLE/OBSERVATEUR) avec toutes les classes, leurs attributs, méthodes et relations. Illustre l'architecture MVC et les 3 design patterns utilisés.
 
-4. **`diagramme-architecture-simple.puml`**
-   - Inclut MainStrategy et la boucle de simulation
+---
 
-Voir `GUIDE_DIAGRAMMES.md` pour savoir quand utiliser chaque diagramme.
+### Diagrammes de séquence
+
+#### Phase COLLECTE
+
+![Collecte](Projet_balise_satellite/resources/Collecte.png)
+
+La balise se déplace en profondeur selon sa stratégie (Linear, Sinusoidal, Vertical, Static) et collecte progressivement des données océaniques. Quand la mémoire est pleine (memory >= maxMemory), elle passe automatiquement en état REMONTEE.
+
+#### Phase REMONTEE
+
+![Remontee](Projet_balise_satellite/resources/Remontee.png)
+
+La balise remonte progressivement vers la surface (y -= riseSpeed) jusqu'à atteindre SURFACE_Y (290). Une fois à la surface, elle attend qu'un satellite disponible passe au-dessus. Si un satellite est détecté via `trySynchronize()`, elle passe en état SYNCHRONISATION.
+
+#### Phase SYNCHRONISATION
+
+![Synchronisation](Projet_balise_satellite/resources/Synchro.png)
+
+La balise transfère ses données vers le satellite en 3 étapes : **Début** (satellite devient indisponible, ligne rouge apparaît), **Transfert** (boucle qui transfère progressivement memory -= transferSpeed), **Fin** (memory == 0, ligne rouge disparaît, satellite redevient disponible, passage en DESCENTE).
+
+#### Phase DESCENTE
+
+![Descente](Projet_balise_satellite/resources/Descente.png)
+
+Après avoir transféré toutes ses données (memory == 0), la balise redescend progressivement vers sa profondeur initiale (y += descentSpeed). Une fois arrivée (y >= initialY), elle repasse en état COLLECTE et un nouveau cycle recommence.
+
+---
+
+### Simulation en action
+
+![Simulation](Projet_balise_satellite/resources/Simulation.png)
+
+Capture d'écran de la simulation montrant les balises (icônes bleues) en profondeur, les satellites (icônes oranges) en orbite, et une ligne rouge de synchronisation active entre une balise et un satellite.
 
 ---
 
