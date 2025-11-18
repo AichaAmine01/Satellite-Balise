@@ -235,8 +235,6 @@ Mise à jour de la vue
 
 ### Diagramme d'architecture
 
-**Diagramme de classes complet**
-
 ![Diagramme de classes](Projet_balise_satellite/resources/diagramme%20de%20classe.png)
 
 Diagramme de classes complet montrant les 4 packages principaux (MODÈLE, VUE, CONTRÔLEUR, OBSERVABLE/OBSERVATEUR).
@@ -245,11 +243,8 @@ Diagramme de classes complet montrant les 4 packages principaux (MODÈLE, VUE, C
 
 ### Diagramme d'état
 
-**Diagramme de classes complet**
+![Diagramme d'état](Projet_balise_satellite/resources/diagrammeEtat.png)
 
-![Diagramme de classes](Projet_balise_satellite/resources/diagramme d'état)
-
-Diagramme de classes complet montrant les 4 packages principaux (MODÈLE, VUE, CONTRÔLEUR, OBSERVABLE/OBSERVATEUR).
 
 ---
 ### Diagrammes de séquence
