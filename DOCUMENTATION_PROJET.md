@@ -35,19 +35,10 @@ Implémente le **Pattern Observable** (médiateur d'événements) permettant la 
 #### `Announcer`
 **Description** : Gestionnaire central des événements. Maintient un registre des listeners et distribue les événements.
 
-**Attributs** :
-- `registrationIndex : Map<Class, List<Object>>` - Index des listeners par type d'événement
 
-**Méthodes principales** :
-- `register(Object listener, Class eventClass)` - Abonne un listener à un type d'événement
-- `unregister(Object listener, Class eventClass)` - Désabonne un listener
-- `announce(AbstractEvent event)` - Diffuse un événement à tous les listeners abonnés
 
 #### `AbstractEvent`
 **Description** : Classe abstraite pour tous les événements. Utilise le **Double Dispatch Pattern**.
-
-**Méthodes** :
-- `sentTo(Object listener)` - Méthode abstraite pour transmettre l'événement au listener approprié
 
 ---
 
@@ -61,28 +52,6 @@ Représente les balises océanographiques autonomes qui collectent des données 
 #### `Balise`
 **Description** : Balise autonome suivant un cycle en 4 phases (Pattern État). Contient son propre `Announcer` (composition).
 
-**Attributs** :
-- `x, y : int` - Position dans l'océan
-- `state : BaliseState` - État actuel (COLLECTE, REMONTEE, SYNCHRONISATION, DESCENTE)
-- `memory : int` - Données collectées actuellement
-- `maxMemory : int` - Capacité maximale (150-300, variable par balise)
-- `movingMethod : MovingMethod` - Stratégie de mouvement (Pattern Stratégie)
-- `announcer : Announcer` - Gestionnaire d'événements (composition)
-- `currentSatellite : Satellite` - Satellite en cours de synchronisation
-- `collectSpeed : int` - Vitesse de collecte (1-3)
-- `transferSpeed : int` - Vitesse de transfert (5-14)
-
-**Méthodes principales** :
-- `move()` - Exécute un cycle selon l'état actuel (machine à états)
-- `trySynchronize(Satellite)` - Tente de démarrer une synchronisation (3 conditions)
-- `setMovingMethod(MovingMethod)` - Définit la stratégie de mouvement
-- `setState(BaliseState)` - Change l'état et émet un événement
-
-**Cycle de vie** :
-1. **COLLECTE** : Déplacement selon stratégie + collecte de données
-2. **REMONTEE** : Montée vers la surface quand mémoire pleine
-3. **SYNCHRONISATION** : Transfert des données vers satellite aligné
-4. **DESCENTE** : Retour à la profondeur initiale
 
 #### `BaliseState` (Enum)
 **Description** : États possibles d'une balise (Pattern État).
@@ -93,20 +62,13 @@ Représente les balises océanographiques autonomes qui collectent des données 
 - `SYNCHRONISATION` - Transfert de données au satellite
 - `DESCENTE` - Retour à la profondeur initiale
 
-**Méthode** :
-- `getDescription()` - Retourne une description textuelle de l'état
-
 #### `BaliseView`
 **Description** : Vue graphique d'une balise. Implémente 2 interfaces de listener.
 
 **Interfaces implémentées** :
 - `BaliseListener` - Reçoit les événements de mouvement
 - `BaliseStateListener` - Reçoit les événements de changement d'état
-
-**Méthodes** :
-- `onBaliseMove(BaliseMoveEvent)` - Redessine la balise à sa nouvelle position
-- `onBaliseStateChange(BaliseStateChangeEvent)` - Change la couleur selon l'état
-- `paint(Graphics)` - Affiche la balise (triangle coloré) et sa barre de mémoire
+- 
 
 ### Événements
 
@@ -125,19 +87,12 @@ Représente les balises océanographiques autonomes qui collectent des données 
 #### `SynchronisationStartEvent`
 **Description** : Événement émis au début d'une synchronisation.
 
-**Attributs** :
-- `balise : Balise` - Balise concernée
-- `satellite : Satellite` - Satellite concerné
-
 **Méthode** :
 - `sentTo(Object)` - Transmet à `SynchronisationListener.onSynchronisationStart()`
 
 #### `SynchronisationEndEvent`
 **Description** : Événement émis à la fin d'une synchronisation.
 
-**Attributs** :
-- `balise : Balise` - Balise concernée
-- `satellite : Satellite` - Satellite concerné
 
 **Méthode** :
 - `sentTo(Object)` - Transmet à `SynchronisationListener.onSynchronisationEnd()`
@@ -169,33 +124,12 @@ Représente les satellites en orbite qui se déplacent horizontalement et reçoi
 #### `Satellite`
 **Description** : Satellite en orbite avec mouvement horizontal et effet de boucle infinie (wrap-around).
 
-**Attributs** :
-- `x, y : int` - Position (Y fixe en orbite, X variable)
-- `direction : int` - Direction de déplacement (1 = droite, -1 = gauche)
-- `disponible : boolean` - Indique si le satellite peut synchroniser
-- `dataReceived : int` - Quantité totale de données reçues
-- `announcer : Announcer` - Gestionnaire d'événements (composition)
-- `screenWidth : int` - Largeur de l'écran pour le wrap-around
-
-**Méthodes principales** :
-- `move(int gap)` - Déplace le satellite avec effet de boucle infinie
-- `isAbove(int baliseX, int baliseY, int tolerance)` - Vérifie l'alignement avec une balise (2 conditions)
-- `receiveData(int amount)` - Reçoit des données d'une balise
-- `setDisponible(boolean)` - Change la disponibilité (occupé/libre)
-
-**Comportement wrap-around** :
-- Si X > largeur écran → réapparaît à gauche (X = 0)
-- Si X < 0 → réapparaît à droite (X = largeur)
-
 #### `SatelliteView`
 **Description** : Vue graphique d'un satellite. Implémente 1 interface de listener.
 
 **Interface implémentée** :
 - `SatelliteListener` - Reçoit les événements de mouvement
 
-**Méthodes** :
-- `onSatelliteMove(SatelliteMoveEvent)` - Redessine le satellite
-- `paint(Graphics)` - Affiche le satellite (rectangle avec antennes)
 
 ### Événements
 
@@ -218,14 +152,6 @@ Représente les satellites en orbite qui se déplacent horizontalement et reçoi
 ### Rôle
 Implémente le **Pattern Stratégie** permettant de définir différents algorithmes de mouvement pour les balises de manière interchangeable.
 
-### Interface
-
-#### `MovingMethod`
-**Description** : Interface définissant le contrat pour les stratégies de mouvement.
-
-**Méthode** :
-- `move(Balise balise)` - Calcule et applique le mouvement à une balise
-
 ### Implémentations
 
 #### `LinearMethod`
@@ -239,36 +165,14 @@ Implémente le **Pattern Stratégie** permettant de définir différents algorit
 #### `SinusoidalMethod`
 **Description** : Mouvement sinusoïdal (oscillation verticale + déplacement horizontal).
 
-**Attributs** :
-- `frequency : double` - Fréquence de l'oscillation
-- `amplitude : int` - Amplitude de l'oscillation verticale
-- `time : int` - Compteur pour calculer la phase
-- `initialY : int` - Position Y initiale mémorisée
-
-**Comportement** :
-- Déplacement horizontal linéaire
-- Oscillation verticale selon la formule : `Y = initialY + amplitude × sin(2π × frequency × time)`
-- Mémorise la position initiale pour éviter l'accumulation d'erreurs
 
 #### `VerticalMethod`
 **Description** : Mouvement vertical en yo-yo (monte et descend).
 
-**Attributs** :
-- `speed : int` - Vitesse verticale (1-3 pixels)
-- `maxDepth : int` - Profondeur maximale
-- `currentDirection : int` - Direction verticale (1 = descend, -1 = remonte)
-
-**Comportement** :
-- Déplacement vertical uniquement
-- Inverse la direction aux limites (surface et profondeur max)
-- Mode yo-yo continu
 
 #### `StaticMethod`
 **Description** : Pas de mouvement (balise fixe).
 
-**Comportement** :
-- La balise reste à sa position initiale
-- Utilisé pour simuler des balises ancrées
 
 ---
 
@@ -279,10 +183,6 @@ Implémente le **Pattern Stratégie** permettant de définir différents algorit
 #### `MainStrategy`
 **Description** : Point d'entrée de l'application. Initialise et lance la simulation.
 
-**Méthodes** :
-- `main(String[] args)` - Crée l'interface graphique et démarre la boucle d'animation
-- Boucle d'animation : 30ms par cycle
-- Détection de synchronisation : appelle `balise.trySynchronize(satellite)` à chaque cycle
 
 **Structure** :
 1. Création de la fenêtre Swing
@@ -300,10 +200,7 @@ Implémente le **Pattern Stratégie** permettant de définir différents algorit
 **Interface implémentée** :
 - `SynchronisationListener` - Reçoit les événements de synchronisation
 
-**Méthodes** :
-- `onSynchronisationStart(SynchronisationStartEvent)` - Ajoute une ligne rouge entre balise et satellite
-- `onSynchronisationEnd(SynchronisationEndEvent)` - Retire la ligne de connexion
-- `paint(Graphics)` - Dessine les lignes de connexion actives
+
 
 ---
 
@@ -311,60 +208,9 @@ Implémente le **Pattern Stratégie** permettant de définir différents algorit
 
 ### 1. Pattern État (State Pattern)
 
-**Description** : Permet à une balise de changer son comportement selon son état interne.
-
-**Classes concernées** :
-- `BaliseState` (enum) - Définit les 4 états possibles
-- `Balise` - Contient l'état actuel et adapte son comportement dans `move()`
-
-**États** :
-1. **COLLECTE** : Mouvement selon stratégie + collecte de données
-2. **REMONTEE** : Montée vers la surface
-3. **SYNCHRONISATION** : Transfert de données
-4. **DESCENTE** : Retour à la profondeur
-
-**Transitions** :
-- COLLECTE → REMONTEE (quand mémoire pleine)
-- REMONTEE → SYNCHRONISATION (quand satellite aligné)
-- SYNCHRONISATION → DESCENTE (quand transfert terminé)
-- DESCENTE → COLLECTE (quand profondeur initiale atteinte)
-
-
-
----
-
 ### 2. Pattern Stratégie (Strategy Pattern)
 
-**Description** : Permet de définir une famille d'algorithmes de mouvement et de les rendre interchangeables.
-
-**Classes concernées** :
-- `MovingMethod` (interface) - Contrat des stratégies
-- `LinearMethod` - Mouvement linéaire horizontal
-- `SinusoidalMethod` - Mouvement sinusoïdal
-- `VerticalMethod` - Mouvement vertical yo-yo
-- `StaticMethod` - Balise fixe
-- `Balise` - Utilise une stratégie via `setMovingMethod()`
-
-**Utilisation** :
-```
-Balise balise = new Balise(x, y, direction);
-balise.setMovingMethod(new SinusoidalMethod()); // Stratégie interchangeable
-```
-
-
-
----
-
 ### 3. Pattern Observable (Observer Pattern)
-
-**Description** : Implémente un mécanisme de notification événementielle permettant le découplage entre modèles et vues.
-
-**Classes concernées** :
-- `Announcer` - Médiateur central (registre + diffusion)
-- `AbstractEvent` - Classe mère des événements
-- Tous les événements (BaliseMoveEvent, SatelliteMoveEvent, etc.)
-- Toutes les interfaces Listener (BaliseListener, SatelliteListener, etc.)
-- Toutes les vues (BaliseView, SatelliteView, SynchronisationLinePanel)
 
 **Architecture** :
 ```
@@ -379,44 +225,11 @@ Listener (BaliseView/SatelliteView)
 Mise à jour de la vue
 ```
 
-**Flux d'événements** :
-1. Modèle change d'état : `balise.move()`
-2. Modèle émet événement : `announcer.announce(new BaliseMoveEvent(this))`
-3. Announcer récupère les listeners : `List<Object> listeners = registrationIndex.get(eventClass)`
-4. Événement se transmet : `event.sentTo(listener)` (Double Dispatch)
-5. Listener reçoit l'événement : `listener.onBaliseMove(event)`
-6. Vue se met à jour : `repaint()`
 
 
 
 ---
 
-
-## Cycle de Synchronisation Complet
-
-### Conditions de déclenchement (3 conditions simultanées)
-1. Balise en état **REMONTEE** et à la surface (Y = 290)
-2. Satellite **disponible** (pas déjà en synchronisation)
-3. **Alignement horizontal** : distance ≤ 10 pixels
-
-### Phases
-1. **Détection** : MainStrategy appelle `balise.trySynchronize(satellite)` à chaque cycle
-2. **Démarrage** :
-   - `balise.startSynchronisation(satellite)`
-   - Changement état balise : REMONTEE → SYNCHRONISATION
-   - Satellite devient indisponible
-   - Émission `SynchronisationStartEvent` → ligne rouge apparaît
-3. **Transfert progressif** :
-   - À chaque cycle : transfert de `transferSpeed` données (5-14)
-   - Durée moyenne : 150 données ÷ 10 par cycle = 15 cycles = 450ms
-4. **Fin** :
-   - Quand mémoire balise = 0
-   - `balise.endSynchronisation()`
-   - Émission `SynchronisationEndEvent` → ligne rouge disparaît
-   - Satellite redevient disponible
-   - Changement état balise : SYNCHRONISATION → DESCENTE
-
----
 
 ## Diagrammes UML
 
