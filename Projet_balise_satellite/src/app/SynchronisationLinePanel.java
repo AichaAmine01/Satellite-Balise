@@ -56,7 +56,7 @@ public class SynchronisationLinePanel extends JPanel implements SynchronisationL
         // Enregistrer la paire en synchronisation
         activeSynchronisations.put(key, new SyncPair(balise, satellite));
         
-        System.out.println("📡 Ligne de synchro: " + balise.getId() + " <-> " + satellite.getId());
+        System.out.println(" Ligne de synchro: " + balise.getId() + " <-> " + satellite.getId());
         repaint(); // Redessiner le panel
     }
     
@@ -75,7 +75,7 @@ public class SynchronisationLinePanel extends JPanel implements SynchronisationL
         // Retirer la paire de la map
         activeSynchronisations.remove(key);
         
-        System.out.println("📡 Fin ligne de synchro: " + balise.getId() + " <-> " + satellite.getId());
+        System.out.println(" Fin ligne de synchro: " + balise.getId() + " <-> " + satellite.getId());
         repaint(); // Redessiner le panel
     }
     
