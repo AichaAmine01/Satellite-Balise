@@ -15,18 +15,38 @@ import satellite.Satellite;
 
 /**
  * Panel transparent qui dessine les lignes de synchronisation entre balises et satellites.
- * Ce panel se superpose à tous les autres composants.
+ * 
+ * Ce panel se superpose à tous les autres composants et réagit aux événements
+ * de synchronisation pour afficher/masquer les lignes de connexion.
+ * 
+ * Fonctionnement :
+ * - Écoute les SynchronisationStartEvent pour commencer à dessiner une ligne
+ * - Écoute les SynchronisationEndEvent pour arrêter de dessiner la ligne
+ * - Redessine automatiquement les lignes à chaque repaint de la fenêtre
+ * 
+ * @see SynchronisationListener
+ * @see SynchronisationStartEvent
+ * @see SynchronisationEndEvent
  */
 public class SynchronisationLinePanel extends JPanel implements SynchronisationListener {
     
     // Map pour stocker les paires balise-satellite en synchronisation
     private Map<String, SyncPair> activeSynchronisations = new HashMap<>();
     
+    /**
+     * Constructeur créant un panel transparent sans layout.
+     */
     public SynchronisationLinePanel() {
         setOpaque(false); // Transparent pour voir à travers
         setLayout(null); // Pas de layout
     }
     
+    /**
+     * Réagit au début d'une synchronisation.
+     * Enregistre la paire balise-satellite et redessine le panel.
+     * 
+     * @param event L'événement de début de synchronisation
+     */
     @Override
     public void onSynchronisationStart(SynchronisationStartEvent event) {
         Balise balise = event.getBalise();
@@ -40,6 +60,12 @@ public class SynchronisationLinePanel extends JPanel implements SynchronisationL
         repaint(); // Redessiner le panel
     }
     
+    /**
+     * Réagit à la fin d'une synchronisation.
+     * Retire la paire balise-satellite et redessine le panel.
+     * 
+     * @param event L'événement de fin de synchronisation
+     */
     @Override
     public void onSynchronisationEnd(SynchronisationEndEvent event) {
         Balise balise = event.getBalise();
@@ -53,14 +79,20 @@ public class SynchronisationLinePanel extends JPanel implements SynchronisationL
         repaint(); // Redessiner le panel
     }
     
+    /**
+     * Dessine toutes les lignes de synchronisation actives.
+     * Appelé automatiquement par Swing lors du repaint.
+     * 
+     * @param g Le contexte graphique
+     */
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
         
-        // Configurer le style de la ligne
+        // Configurer le style de la ligne (rouge, épaisseur 2)
         g2d.setColor(Color.RED);
-        g2d.setStroke(new BasicStroke(2)); // Ligne épaisse
+        g2d.setStroke(new BasicStroke(2));
         
         // Dessiner une ligne pour chaque synchronisation active
         for (SyncPair pair : activeSynchronisations.values()) {
@@ -74,7 +106,7 @@ public class SynchronisationLinePanel extends JPanel implements SynchronisationL
     }
     
     /**
-     * Classe interne pour stocker une paire balise-satellite
+     * Classe interne pour stocker une paire balise-satellite en synchronisation.
      */
     private static class SyncPair {
         Balise balise;

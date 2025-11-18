@@ -46,19 +46,27 @@ public class Satellite {
 	}
 	
 	/**
-	 * Déplace le satellite et gère la boucle (réapparition de l'autre côté)
-	 * @param gap Distance de déplacement
+	 * Déplace le satellite horizontalement avec gestion de la boucle infinie (wrap-around).
+	 * Le satellite se déplace à vitesse constante et réapparaît de l'autre côté de l'écran.
+	 * 
+	 * @param gap Distance de déplacement en pixels (multipliée par la direction)
 	 */
 	public void move(int gap) {
+		// Calculer la nouvelle position : direction = 1 (droite) ou -1 (gauche)
 		this.x = this.x + (direction * gap);
 		
-		// Gestion de la boucle : si le satellite sort de l'écran, il réapparaît de l'autre côté
+		// Gestion du wrap-around : créer un effet de boucle infinie
+		// Si le satellite sort à droite → réapparaît à gauche
 		if (this.x > screenWidth) {
-			this.x = 0;  // Réapparaît à gauche
-		} else if (this.x < 0) {
-			this.x = screenWidth;  // Réapparaît à droite
+			this.x = 0;
+		} 
+		// Si le satellite sort à gauche → réapparaît à droite
+		else if (this.x < 0) {
+			this.x = screenWidth;
 		}
 		
+		// Pattern Observable : Émettre un événement de mouvement
+		// Notifie les vues (SatelliteView) pour qu'elles se rafraîchissent
 		announcer.announce(new SatelliteMoveEvent(this));
 	}
 
@@ -67,14 +75,20 @@ public class Satellite {
 	}
 	
 	/**
-	 * Vérifie si le satellite est au-dessus d'une balise (dans une zone de synchronisation)
+	 * Vérifie si le satellite est aligné avec une balise et disponible pour la synchronisation.
+	 * 
+	 * Deux conditions nécessaires :
+	 * 1. Le satellite doit être disponible (pas déjà en train de synchroniser)
+	 * 2. La distance horizontale doit être <= tolerance (alignement horizontal)
+	 * 
 	 * @param baliseX Position X de la balise
-	 * @param baliseY Position Y de la balise
-	 * @param tolerance Tolérance horizontale pour la synchronisation
+	 * @param baliseY Position Y de la balise (non utilisé car satellite en orbite fixe)
+	 * @param tolerance Tolérance horizontale en pixels (ex: 10 pixels)
 	 * @return true si le satellite peut se synchroniser avec la balise
 	 */
 	public boolean isAbove(int baliseX, int baliseY, int tolerance) {
-		// Le satellite doit être disponible et proche horizontalement
+		// Vérifier la disponibilité du satellite (pas occupé par une autre balise)
+		// ET vérifier l'alignement horizontal (distance absolue <= tolérance)
 		return disponible && Math.abs(this.x - baliseX) <= tolerance;
 	}
 	

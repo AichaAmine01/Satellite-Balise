@@ -127,7 +127,7 @@ public class MainStrategy {
 		balises.add(b3);
 		baliseViews.add(bv3);
 
-		// Balise 4 : Mouvement vertical (YO-YO en profondeur)
+		// Balise 4 : Mouvement vertical
 		Balise b4 = new Balise(600, OCEAN_START_Y + 200, 1, "Balise_Vertical"); // Y=500 (profondeur)
 		BaliseView bv4 = new BaliseView(b4);
 		// Yo-yo entre profondeur moyenne (450) et grande profondeur (550)
@@ -140,7 +140,7 @@ public class MainStrategy {
 		balises.add(b4);
 		baliseViews.add(bv4);
 
-		// ==================== Ajout des éléments à l'interface (ORDRE IMPORTANT!) ====================
+		// ==================== Ajout des éléments à l'interface ====================
 		// Z-order (profondeur) : satellites en arrière -> océan (mais transparent pour laisser voir balises) -> balises en avant
 		
 		// 1. Ajouter les satellites d'abord (zone blanche)

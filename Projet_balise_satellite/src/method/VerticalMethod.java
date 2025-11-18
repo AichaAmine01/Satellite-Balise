@@ -35,19 +35,21 @@ public class VerticalMethod implements MovingMethod {
 
     @Override
     public void move(Balise balise) {
+        // Calculer la nouvelle position Y en fonction de la direction (1 = descendre, -1 = remonter)
         int newY = balise.getY() + direction * verticalStep;
         
-        // Vérifier les limites
+        // Vérifier les limites de profondeur
         if (changeDirectionAtLimits) {
+            // Mode yo-yo : inverser la direction aux limites
             if (newY >= maxDepth) {
-                newY = maxDepth;
-                direction = -1; // Remonter
+                newY = maxDepth;          // Limiter à la profondeur maximale
+                direction = -1;           // Inverser la direction : remonter
             } else if (newY <= minDepth) {
-                newY = minDepth;
-                direction = 1; // Descendre
+                newY = minDepth;          // Limiter à la profondeur minimale
+                direction = 1;            // Inverser la direction : descendre
             }
         } else {
-            // Limiter sans changer de direction (rester à la limite)
+            // Mode limite simple : rester bloqué à la limite sans changer de direction
             if (newY > maxDepth) {
                 newY = maxDepth;
             } else if (newY < minDepth) {
@@ -55,6 +57,7 @@ public class VerticalMethod implements MovingMethod {
             }
         }
         
+        // Appliquer la nouvelle position Y
         balise.setY(newY);
     }
 
