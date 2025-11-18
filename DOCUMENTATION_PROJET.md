@@ -1,12 +1,12 @@
-# 📡 Projet Balise-Satellite
+# Projet Balise-Satellite
 
-## 📋 Vue d'ensemble
+## Vue d'ensemble
 
 Simulation d'un système de collecte de données océanographiques par des balises autonomes communicant avec des satellites en orbite. Le projet met en œuvre **3 design patterns majeurs** pour gérer le cycle de vie des balises, leurs stratégies de mouvement et la communication événementielle.
 
 ---
 
-## 🗂️ Organisation des Packages
+## Organisation des Packages
 
 ```
 src/
@@ -14,12 +14,12 @@ src/
 ├── app/                # Point d'entrée et interface graphique
 ├── balise/             # Modèle des balises autonomes
 ├── method/             # Pattern Stratégie - Algorithmes de mouvement
-└── satellite/          # Modèle des satellites en orbite
+└── satellite/          # Modèle des satellites
 ```
 
 ---
 
-## 📦 Package `announcer` - Pattern Observable
+## Package `announcer` - Pattern Observable
 
 ### Rôle
 Implémente le **Pattern Observable** (médiateur d'événements) permettant la communication découplée entre les modèles (Balise, Satellite) et les vues (BaliseView, SatelliteView).
@@ -45,7 +45,7 @@ Implémente le **Pattern Observable** (médiateur d'événements) permettant la 
 
 ---
 
-## 📦 Package `balise` - Modèle des Balises
+## Package `balise` - Modèle des Balises
 
 ### Rôle
 Représente les balises océanographiques autonomes qui collectent des données et se synchronisent avec les satellites.
@@ -159,7 +159,7 @@ Représente les balises océanographiques autonomes qui collectent des données 
 
 ---
 
-## 📦 Package `satellite` - Modèle des Satellites
+## Package `satellite` - Modèle des Satellites
 
 ### Rôle
 Représente les satellites en orbite qui se déplacent horizontalement et reçoivent les données des balises.
@@ -213,7 +213,7 @@ Représente les satellites en orbite qui se déplacent horizontalement et reçoi
 
 ---
 
-## 📦 Package `method` - Pattern Stratégie
+## Package `method` - Pattern Stratégie
 
 ### Rôle
 Implémente le **Pattern Stratégie** permettant de définir différents algorithmes de mouvement pour les balises de manière interchangeable.
@@ -490,7 +490,7 @@ java -cp bin app.MainStrategy
 
 ---
 
-## 📈 Caractéristiques Variables
+## Caractéristiques Variables
 
 Chaque balise a des caractéristiques aléatoires pour créer de la variabilité :
 
@@ -504,7 +504,7 @@ Chaque balise a des caractéristiques aléatoires pour créer de la variabilité
 
 ---
 
-## 🎯 Points Clés du Projet
+## Points Clés du Projet
 
 ### Architecture
 - **3 packages métier** clairement séparés (balise, satellite, method)
@@ -528,10 +528,8 @@ Chaque balise a des caractéristiques aléatoires pour créer de la variabilité
 
 ---
 
-## 📝 Auteurs
+## Auteurs
 
-Projet réalisé dans le cadre du cours de Conception Objet - Master 2 TIIL-A
-
----
-
-*Document généré le 18 novembre 2025*
+Projet réalisé dans le cadre du cours de Conception Objet - Master 2 TIIL-A par :
+ - Naël ABASY
+ - Aïcha AMINE
