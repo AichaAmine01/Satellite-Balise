@@ -5,15 +5,14 @@ import balise.Balise;
 /**
  * Stratégie de mouvement horizontal linéaire (Pattern STRATÉGIE).
  * 
- * <p>Déplace la balise horizontalement à vitesse constante.
+ * Déplace la balise horizontalement à vitesse constante.
  * La balise se déplace de gauche à droite (ou droite à gauche selon la direction)
  * et rebondit aux bords de l'écran en inversant sa direction.
  * 
- * <p><b>Algorithme :</b>
- * <pre>
+ * Algorithme :
+ * 
  * nouvellePosX = positionX + (direction * vitesse)
  * si (bord atteint) alors direction = -direction
- * </pre>
  * 
  * @see MovingMethod
  */

@@ -3,18 +3,12 @@ package balise;
 /**
  * Énumération des états possibles d'une balise (Pattern ÉTAT).
  * 
- * <p>Représente les 4 phases du cycle de vie d'une balise océanique autonome :
- * <ul>
- *   <li>COLLECTE : Phase de descente en profondeur avec collecte de données</li>
- *   <li>REMONTEE : Phase de remontée vers la surface en attente d'un satellite</li>
- *   <li>SYNCHRONISATION : Phase de transfert des données vers un satellite disponible</li>
- *   <li>DESCENTE : Phase de retour en profondeur après synchronisation</li>
- * </ul>
+ * Représente les 4 phases du cycle de vie d'une balise océanique autonome :
  * 
- * <p>Les transitions entre états sont automatiques et gérées dans {@link Balise#move()}.
- * 
- * @see Balise#setState(BaliseState)
- * @see Balise#move()
+ *   COLLECTE : Phase de descente en profondeur avec collecte de données
+ *   REMONTEE : Phase de remontée vers la surface en attente d'un satellite
+ *   SYNCHRONISATION : Phase de transfert des données vers un satellite disponible
+ *   DESCENTE : Phase de retour en profondeur après synchronisation
  */
 public enum BaliseState {
 	/** État initial : Balise en profondeur, collecte des données océanographiques */

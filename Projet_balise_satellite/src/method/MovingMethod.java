@@ -5,21 +5,11 @@ import balise.Balise;
 /**
  * Interface définissant le contrat d'une stratégie de mouvement (Pattern STRATÉGIE).
  * 
- * <p>Permet d'encapsuler différents algorithmes de déplacement pour les balises.
+ * Permet d'encapsuler différents algorithmes de déplacement pour les balises.
  * Chaque implémentation concrète définit un comportement de mouvement spécifique :
- * <ul>
- *   <li>{@link LinearMethod} : Mouvement horizontal linéaire avec rebonds</li>
- *   <li>{@link SinusoidalMethod} : Mouvement sinusoïdal (ondulation)</li>
- *   <li>{@link VerticalMethod} : Mouvement vertical yo-yo</li>
- *   <li>{@link StaticMethod} : Position fixe (immobile)</li>
- * </ul>
  * 
- * <p><b>Pattern Stratégie :</b> Permet de changer dynamiquement l'algorithme de mouvement
- * sans modifier la classe {@link Balise}. La balise délègue son déplacement à la stratégie
- * via {@link Balise#move()}.
- * 
- * @see Balise#setMovingMethod(MovingMethod)
- * @see Balise#move()
+ * Pattern Stratégie : Permet de changer dynamiquement l'algorithme de mouvement
+ * sans modifier la classe. La balise délègue son déplacement à la stratégie
  */
 public interface MovingMethod {
     /**

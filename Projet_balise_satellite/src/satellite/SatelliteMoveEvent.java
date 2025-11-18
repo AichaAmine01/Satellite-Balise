@@ -6,9 +6,6 @@ import announcer.AbstractEvent;
  * Événement déclenché lorsqu'un satellite se déplace.
  * Cet événement est émis à chaque itération de la boucle d'animation (30ms)
  * pour notifier les observateurs (notamment SatelliteView) du changement de position.
- * 
- * @see SatelliteListener
- * @see Satellite#move()
  */
 public class SatelliteMoveEvent extends AbstractEvent{
 
