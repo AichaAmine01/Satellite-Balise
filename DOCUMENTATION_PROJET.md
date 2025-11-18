@@ -392,7 +392,7 @@ Mise à jour de la vue
 ---
 
 
-## 🔄 Cycle de Synchronisation Complet
+## Cycle de Synchronisation Complet
 
 ### Conditions de déclenchement (3 conditions simultanées)
 1. Balise en état **REMONTEE** et à la surface (Y = 290)
@@ -418,7 +418,7 @@ Mise à jour de la vue
 
 ---
 
-## 📊 Diagrammes UML
+## Diagrammes UML
 
 ### Diagramme d'architecture
 
