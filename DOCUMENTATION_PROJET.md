@@ -6,6 +6,12 @@ Simulation d'un système de collecte de données océanographiques par des balis
 
 ---
 
+
+![Simulation](Projet_balise_satellite/resources/Simulation.png)
+
+
+---
+
 ## Organisation des Packages
 
 ```
@@ -101,12 +107,6 @@ Représente les balises océanographiques autonomes qui collectent des données 
 - `onBaliseMove(BaliseMoveEvent)` - Redessine la balise à sa nouvelle position
 - `onBaliseStateChange(BaliseStateChangeEvent)` - Change la couleur selon l'état
 - `paint(Graphics)` - Affiche la balise (triangle coloré) et sa barre de mémoire
-
-**Couleurs par état** :
-- COLLECTE : Bleu
-- REMONTEE : Jaune
-- SYNCHRONISATION : Vert
-- DESCENTE : Orange
 
 ### Événements
 
@@ -272,7 +272,7 @@ Implémente le **Pattern Stratégie** permettant de définir différents algorit
 
 ---
 
-## 📦 Package `app` - Application et Interface
+## Package `app` - Application et Interface
 
 ### Classes
 
@@ -307,7 +307,7 @@ Implémente le **Pattern Stratégie** permettant de définir différents algorit
 
 ---
 
-## 🎨 Design Patterns Utilisés
+##  Design Patterns Utilisés
 
 ### 1. Pattern État (State Pattern)
 
@@ -329,10 +329,7 @@ Implémente le **Pattern Stratégie** permettant de définir différents algorit
 - SYNCHRONISATION → DESCENTE (quand transfert terminé)
 - DESCENTE → COLLECTE (quand profondeur initiale atteinte)
 
-**Avantages** :
-- Code organisé par état (pas de if/else géant)
-- Ajout facile de nouveaux états
-- Comportement clair et maintenable
+
 
 ---
 
@@ -354,11 +351,7 @@ Balise balise = new Balise(x, y, direction);
 balise.setMovingMethod(new SinusoidalMethod()); // Stratégie interchangeable
 ```
 
-**Avantages** :
-- Comportements de mouvement encapsulés
-- Changement de stratégie à runtime possible
-- Ajout de nouvelles stratégies sans modifier Balise
-- Respect du principe Open/Closed
+
 
 ---
 
@@ -398,26 +391,6 @@ Mise à jour de la vue
 
 ---
 
-### 4. Pattern Double Dispatch (bonus)
-
-**Description** : Technique permettant à un événement de se transmettre lui-même au bon type de listener.
-
-**Classes concernées** :
-- `AbstractEvent.sentTo(Object)` - Méthode abstraite
-- Tous les événements concrets implémentent `sentTo()`
-
-**Fonctionnement** :
-```java
-// Dans Announcer.announce()
-event.sentTo(listener); // Premier dispatch : type d'événement
-
-// Dans BaliseMoveEvent.sentTo()
-((BaliseListener) listener).onBaliseMove(this); // Second dispatch : type de listener
-```
-
-
-
----
 
 ## 🔄 Cycle de Synchronisation Complet
 
@@ -453,7 +426,7 @@ event.sentTo(listener); // Premier dispatch : type d'événement
 
 ![Diagramme de classes](Projet_balise_satellite/resources/diagramme%20de%20classe.png)
 
-Diagramme de classes complet montrant les 4 packages principaux (MODÈLE, VUE, CONTRÔLEUR, OBSERVABLE/OBSERVATEUR) avec toutes les classes, leurs attributs, méthodes et relations. Illustre l'architecture MVC et les 3 design patterns utilisés.
+Diagramme de classes complet montrant les 4 packages principaux (MODÈLE, VUE, CONTRÔLEUR, OBSERVABLE/OBSERVATEUR).
 
 ---
 
@@ -483,68 +456,10 @@ La balise transfère ses données vers le satellite en 3 étapes : **Début** (s
 
 Après avoir transféré toutes ses données (memory == 0), la balise redescend progressivement vers sa profondeur initiale (y += descentSpeed). Une fois arrivée (y >= initialY), elle repasse en état COLLECTE et un nouveau cycle recommence.
 
----
-
-### Simulation en action
-
-![Simulation](Projet_balise_satellite/resources/Simulation.png)
-
-Capture d'écran de la simulation montrant les balises (icônes bleues) en profondeur, les satellites (icônes oranges) en orbite, et une ligne rouge de synchronisation active entre une balise et un satellite.
 
 ---
 
-## 🚀 Compilation et Exécution
 
-### Compilation
-```bash
-cd Projet_balise_satellite
-javac -encoding UTF-8 -cp bin -d bin -sourcepath src src/app/MainStrategy.java
-```
-
-### Exécution
-```bash
-java -cp bin app.MainStrategy
-```
-
----
-
-## Caractéristiques Variables
-
-Chaque balise a des caractéristiques aléatoires pour créer de la variabilité :
-
-| Caractéristique | Plage de valeurs | Impact |
-|----------------|------------------|---------|
-| `maxMemory` | 150-300 | Durée de la phase COLLECTE |
-| `collectSpeed` | 1-3 | Vitesse de remplissage de la mémoire |
-| `riseSpeed` | 1-3 | Vitesse de remontée |
-| `descentSpeed` | 1-2 | Vitesse de descente |
-| `transferSpeed` | 5-14 | Durée de la synchronisation |
-
----
-
-## Points Clés du Projet
-
-### Architecture
-- **3 packages métier** clairement séparés (balise, satellite, method)
-- **1 package infrastructure** (announcer)
-- **1 package application** (app)
-
-### Découplage
-- **Composition** : Chaque modèle contient son propre Announcer (◆)
-- **Interfaces** : 3 types de listeners pour séparer les préoccupations
-- **Événements** : 6 types d'événements pour couvrir tous les changements
-
-### Extensibilité
-- Ajout de nouvelles stratégies : implémenter `MovingMethod`
-- Ajout de nouveaux états : ajouter dans l'enum `BaliseState`
-- Ajout de nouvelles vues : implémenter les interfaces Listener
-
-### Testabilité
-- Modèles indépendants des vues
-- Stratégies isolées et testables unitairement
-- Pattern Observable permet le mock des listeners
-
----
 
 ## Auteurs
 
